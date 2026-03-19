@@ -2,1460 +2,552 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار تفاعلي</title>
-    <!-- تحميل Tailwind CSS للتصميم -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Learnova Jump - Offline Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* خط بسيط لضمان التوافق مع العربية والإنجليزية */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
-        
         body {
-            font-family: 'Tajawal', 'Inter', sans-serif;
+            font-family: 'Cairo', sans-serif;
+            touch-action: none;
+            overflow: hidden;
+            background: #000000;
         }
-
-        /* كلاسات مخصصة لتمييز الإجابات */
-        .correct-answer {
-            @apply bg-green-100 border-green-500 text-green-800;
+        #gameCanvas {
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.05);
+            max-width: 100%;
+            height: 100%;
+            background: #050505;
+            transition: box-shadow 1s ease;
+            border-radius: 12px;
         }
-        .incorrect-answer {
-            @apply bg-red-100 border-red-500 text-red-800;
+        .game-container {
+            width: 100%;
+            max-width: 600px; /* شاشة أكبر للشاشات الكبيرة ولكن محكومة */
+            height: 85vh;
+            position: relative;
         }
-        .option-btn:disabled {
-            @apply opacity-70 cursor-not-allowed;
+        .metallic-text {
+            background: linear-gradient(to bottom, #ffffff 0%, #a1a1aa 50%, #3f3f46 51%, #e4e4e7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));
         }
-        .option-btn:not(:disabled):hover {
-            @apply bg-gray-100 border-blue-500;
+        .phase-shift {
+            animation: flash 1s ease-out;
+        }
+        @keyframes flash {
+            0% { background-color: rgba(255, 255, 255, 0.9); }
+            100% { background-color: transparent; }
+        }
+        @keyframes pulse-text {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+        .level-up-anim {
+            animation: pulse-text 2s ease-in-out forwards;
         }
     </style>
-    <!-- ===== كل الجافAScript هنا ===== -->
-    <script>
-        // --- 1. قاعدة بيانات الأسئلة ---
-        // !! ملاحظة هامة: هذا هو المكان الذي تضيف فيه كل أسئلتك من ملف PDF !!
-        const allQuestions = [
-            {
-                question: "7. The requirements to enable communication between these two VLANs while using the router-on-a-stick approach are...",
-                options: [
-                    "A multilayer switch is needed.",
-                    "A router with at least two LAN interfaces is needed.",
-                    "Two groups of switches are needed, each with ports that are configured for one VLAN.",
-                    "A switch with a port that is configured as a trunk is needed when connecting to the router."
-                ],
-                answer: "A switch with a port that is configured as a trunk is needed when connecting to the router."
-            },
-            {
-                question: "8. An EtherChannel link is configured with three interfaces between two switches. The result if one of the three interfaces is down will be...",
-                options: [
-                    "The remaining two interfaces continue to load balance traffic.",
-                    "The remaining two interfaces become separate links between the two switches.",
-                    "One interface becomes an active link for data traffic and the other becomes a backup link.",
-                    "The EtherChannel fails."
-                ],
-                answer: "The remaining two interfaces continue to load balance traffic."
-            },
-            {
-                question: "9. An EtherChannel has been configured between two switches that are connected via four trunk links. If the physical interface for one of the trunk links changes to a down state, what happens to the EtherChannel?",
-                options: [
-                    "Spanning Tree Protocol will transition the failed physical interface into forwarding mode.",
-                    "Spanning Tree Protocol will recalculate the remaining trunk links.",
-                    "The EtherChannel will transition to a down state.",
-                    "The EtherChannel will remain functional."
-                ],
-                answer: "The EtherChannel will remain functional."
-            },
-            {
-                question: "10. An EtherChannel link is configured between switches SW1 and SW2 by using the command SW1(config-if-range)# channel-group 1 mode auto Which command must be used on SW2 to enable this EtherChannel?",
-                options: [
-                    "SW2(config-if-range)# channel-group 1 mode passive",
-                    "SW2(config-if-range)# channel-group 1 mode desirable",
-                    "SW2(config-if-range)# channel-group 1 mode on",
-                    "SW2(config-if-range)# channel-group 1 mode active"
-                ],
-                answer: "SW2(config-if-range)# channel-group 1 mode desirable"
-            },
-            {
-                question: "11. A network administrator issues the show vlan brief command while troubleshooting a user support ticket. What output will be displayed?",
-                options: [
-                    "the VLAN assignment and membership for device MAC addresses",
-                    "the VLAN assignment and membership for all switch ports",
-                    "the VLAN assignment and trunking encapsulation",
-                    "the VLAN assignment and native VLAN"
-                ],
-                answer: "the VLAN assignment and membership for all switch ports"
-            },
-            {
-                question: "12. A network contains multiple VLANs spanning multiple switches. What happens when a device in VLAN 20 sends a broadcast Ethernet frame?",
-                options: [
-                    "All devices in all VLANs see the frame.",
-                    "Devices in VLAN 20 and the management VLAN see the frame.",
-                    "Only devices in VLAN 20 see the frame.",
-                    "Only devices that are connected to the local switch see the frame."
-                ],
-                answer: "Only devices in VLAN 20 see the frame."
-            },
-            {
-                question: "13. A set of switches is being connected in a LAN topology. Which STP bridge priority value will make it least likely for the switch to be selected as the root?",
-                options: [
-                    "65535",
-                    "4096",
-                    "32768",
-                    "61440"
-                ],
-                answer: "65535"
-            },
-            {
-                question: "14. A small company network has six interconnected Layer 2 switches. Currently all switches are using the default bridge priority value. Which value can be used to configure the bridge priority of one of the switches to ensure that it becomes the root bridge in this design?",
-                options: [
-                    "1",
-                    "28672",
-                    "32768",
-                    "34816",
-                    "61440"
-                ],
-                answer: "1"
-            },
-            {
-                question: "15. A switch is configured to run STP. What term describes a field that has a default value of 32,768 and is the initial deciding factor when electing a root bridge?",
-                options: [
-                    "bridge priority",
-                    "MAC Address",
-                    "extended system ID",
-                    "bridge ID"
-                ],
-                answer: "bridge priority"
-            },
-            {
-                question: "16. A switch is configured to run STP. What term describes a field used to specify a VLAN ID?",
-                options: [
-                    "extended system ID",
-                    "port ID",
-                    "bridge priority",
-                    "bridge ID"
-                ],
-                answer: "extended system ID"
-            },
-            {
-                question: "17. A switch is configured to run STP. What term describes a non-root port that is permitted to forward traffic on the network?",
-                options: [
-                    "root port",
-                    "designated port",
-                    "alternate port",
-                    "disabled"
-                ],
-                answer: "designated port"
-            },
-            {
-                question: "18. A switch is configured to run STP. What term describes the reference point for all path calculations?",
-                options: [
-                    "root bridge",
-                    "root port",
-                    "designated port",
-                    "alternate port"
-                ],
-                answer: "root bridge"
-            },
-            {
-                question: "19. A switch is configured to run STP. What term describes the switch port closest, in terms of overall cost, to the root bridge?",
-                options: [
-                    "root port",
-                    "designated port",
-                    "alternate port",
-                    "disabled"
-                ],
-                answer: "root port"
-            },
-            {
-                question: "20. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# mdix auto command?",
-                options: [
-                    "It automatically adjusts the port to allow device connections to use either a straight-through or a crossover cable.",
-                    "It applies an IPv4 address to the virtual interface.",
-                    "It applies an IPv6 address to the virtual interface.",
-                    "It permits an IPv6 address to be configured on a switch physical interface.",
-                    "It updates the MAC address table for the associated port."
-                ],
-                answer: "It automatically adjusts the port to allow device connections to use either a straight-through or a crossover cable."
-            },
-            {
-                question: "21. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# ip address 172.18.33.88 255.255.255.0 command?",
-                options: [
-                    "It applies an IPv4 address to the virtual interface.",
-                    "It applies an IPv6 address to the virtual interface.",
-                    "It activates a virtual or physical switch interface.",
-                    "It permits an IPv6 address to be configured on a switch physical interface.",
-                    "It updates the MAC address table for the associated port."
-                ],
-                answer: "It applies an IPv4 address to the virtual interface."
-            },
-            {
-                question: "22. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw# configure terminal command?",
-                options: [
-                    "It enters the global configuration mode.",
-                    "It enters configuration mode for a switch virtual interface.",
-                    "It applies an IPv4 address to the virtual interface.",
-                    "It updates the MAC address table for the associated port.",
-                    "It permits an IPv6 address to be configured on a switch physical interface."
-                ],
-                answer: "It enters the global configuration mode."
-            },
-            {
-                question: "23. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw# configure terminal command?",
-                options: [
-                    "It enters the global configuration mode.",
-                    "It saves the running configuration to NVRAM.",
-                    "It disables a virtual or physical switch interface.",
-                    "It updates the MAC address table for the associated port.",
-                    "It saves the startup configuration to the running configuration."
-                ],
-                answer: "It enters the global configuration mode."
-            },
-            {
-                question: "24. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# shutdown command?",
-                options: [
-                    "It disables a virtual or physical switch interface.",
-                    "It saves the running configuration to NVRAM.",
-                    "It activates a virtual or physical switch interface.",
-                    "It updates the MAC address table for the associated port.",
-                    "It saves the startup configuration to the running configuration."
-                ],
-                answer: "It disables a virtual or physical switch interface."
-            },
-            {
-                question: "25. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# shutdown command?",
-                options: [
-                    "It disables a virtual or physical switch interface.",
-                    "It applies an IPv6 address to the virtual interface.",
-                    "It applies an IPv4 address to the virtual interface.",
-                    "It permits an IPv6 address to be configured on a switch physical interface.",
-                    "It updates the MAC address table for the associated port."
-                ],
-                answer: "It disables a virtual or physical switch interface."
-            },
-            {
-                question: "26. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# ipv6 address 2001:db8:a2b4:88::1/64 command?",
-                options: [
-                    "It applies an IPv6 address to the virtual interface.",
-                    "It activates a virtual or physical switch interface.",
-                    "It applies an IPv4 address to the virtual interface.",
-                    "It permits an IPv6 address to be configured on a switch physical interface.",
-                    "It updates the MAC address table for the associated port."
-                ],
-                answer: "It applies an IPv6 address to the virtual interface."
-            },
-            {
-                question: "27. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# exit command?",
-                options: [
-                    "It returns to global configuration mode.",
-                    "It returns to privileged mode.",
-                    "It configures the default gateway for the switch.",
-                    "It enters user mode.",
-                    "It saves the startup configuration to the running configuration."
-                ],
-                answer: "It returns to global configuration mode."
-            },
-            {
-                question: "28. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw> enable command?",
-                options: [
-                    "It enters privileged mode.",
-                    "It enters the global configuration mode.",
-                    "It enters configuration mode for a switch virtual interface.",
-                    "It updates the MAC address table for the associated port.",
-                    "It permits an IPv6 address to be configured on a switch physical interface."
-                ],
-                answer: "It enters privileged mode."
-            },
-            {
-                question: "29. A technician is configuring a new Cisco 2960 switch. What is the effect of issuing the BranchSw(config-if)# duplex full command?",
-                options: [
-                    "It allows data to flow in both directions at the same time on the interface.",
-                    "It allows data to flow in only one direction at a time on the interface",
-                    "It automatically adjusts the port to allow device connections to use either a straight-through or a crossover cable.",
-                    "It configures the switch as the default gateway.",
-                    "It encrypts user-mode passwords when users connect remotely."
-                ],
-                answer: "It allows data to flow in both directions at the same time on the interface."
-            },
-            {
-                question: "30. After which step of the switch bootup sequence is the boot loader executed?",
-                options: [
-                    "after CPU initialization",
-                    "after IOS localization",
-                    "after flash file system initialization",
-                    "after POST execution"
-                ],
-                answer: "after POST execution"
-            },
-            {
-                question: "31. During the implementation of Spanning Tree Protocol, all switches are rebooted by the network administrator. What is the first step of the spanning-tree election process?",
-                options: [
-                    "Each switch with a lower root ID than its neighbor will not send BPDUs.",
-                    "All the switches send out BPDUs advertising themselves as the root bridge.",
-                    "Each switch determines the best path to forward traffic.",
-                    "Each switch determines what port to block to prevent a loop from occurring."
-                ],
-                answer: "All the switches send out BPDUs advertising themselves as the root bridge."
-            },
-            {
-                question: "32. How do switch buffers affect network performance?",
-                options: [
-                    "They provide error checking on the data received.",
-                    "They store frames received, thus preventing premature frame discarding when network congestion occurs.",
-                    "They provide extra memory for a particular port if autonegotiation of speed or duplex fails.",
-                    "They hold data temporarily when a collision occurs until normal data transmission resumes."
-                ],
-                answer: "They store frames received, thus preventing premature frame discarding when network congestion occurs."
-            },
-            {
-                question: "33. If no bridge priority is configured in PVST, which criteria is considered when electing the root bridge?",
-                options: [
-                    "lowest MAC address",
-                    "lowest IP address",
-                    "highest IP address",
-                    "highest MAC address"
-                ],
-                answer: "lowest MAC address"
-            },
-            {
-                question: "34. If one end of an Ethernet connection is configured for full duplex and the other end of the connection is configured for half duplex, where would late collisions be observed?",
-                options: [
-                    "on both ends of the connection",
-                    "on the full-duplex end of the connection",
-                    "only on serial interfaces",
-                    "on the half-duplex end of the connection"
-                ],
-                answer: "on the half-duplex end of the connection"
-            },
-            {
-                question: "35. In which port states does a switch learn MAC addresses and process BPDUs in a PVST network?",
-                options: [
-                    "disabled",
-                    "forwarding",
-                    "listening",
-                    "blocking"
-                ],
-                answer: "forwarding"
-            },
-            {
-                question: "36. In which two PVST+ port states are MAC addresses learned?",
-                options: [
-                    "Learning and forwarding states",
-                    "Disabled and listening states",
-                    "Listening and learning states",
-                    "Blocking and forwarding states"
-                ],
-                answer: "Learning and forwarding states"
-            },
-            {
-                question: "37. On a switch that is configured with multiple VLANs, which command will remove only VLAN 100 from the switch?",
-                options: [
-                    "Switch# delete flash:vlan.dat",
-                    "Switch(config-if)# no switchport access vlan 100",
-                    "Switch(config-if)# no switchport trunk allowed vlan 100",
-                    "Switch(config)# no vlan 100"
-                ],
-                answer: "Switch(config)# no vlan 100"
-            },
-            {
-                question: "38. Port Fa0/11 on a switch is assigned to VLAN 30. If the command no switchport access vlan 30 is entered on the Fa0/11 interface, what will happen?",
-                options: [
-                    "Port Fa0/11 will be shutdown.",
-                    "An error message would be displayed.",
-                    "Port Fa0/11 will be returned to VLAN 1.",
-                    "VLAN 30 will be deleted."
-                ],
-                answer: "Port Fa0/11 will be returned to VLAN 1."
-            },
-            {
-                question: "39. Refer to the exhibit. A network administrator has configured R1 as shown... interface is administratively down. What additional command must be entered... to bring the interface up?",
-                options: [
-                    "IPv6 enable",
-                    "clockrate 128000",
-                    "end",
-                    "no shutdown"
-                ],
-                answer: "no shutdown"
-            },
-            {
-                question: "40. Refer to the exhibit. ...What command will be required on a switch that is connected to the Gi0/0 interface on router CiscoVille to allow inter-VLAN routing",
-                options: [
-                    "switchport mode access",
-                    "no switchport",
-                    "switchport mode trunk",
-                    "switchport mode dynamic desirable"
-                ],
-                answer: "switchport mode trunk"
-            },
-            {
-                question: "41. Refer to the exhibit. ...What type of port will be required on a switch that is connected to Gi0/0 on router CiscoVille to allow inter-VLAN routing?",
-                options: [
-                    "routed port",
-                    "access port",
-                    "trunk port",
-                    "SVI"
-                ],
-                answer: "trunk port"
-            },
-            {
-                question: "42. Refer to the exhibit. ...the EtherChannel link fails to establish. What change in configuration would correct the problem? (SW1 is auto, SW2 is active)",
-                options: [
-                    "Configure SW2 EtherChannel mode to desirable",
-                    "Configure SW2 EtherChannel mode to on",
-                    "Configure SW1 EtherChannel mode to on",
-                    "Configure SW2 EtherChannel mode to auto"
-                ],
-                answer: "Configure SW2 EtherChannel mode to desirable"
-            },
-            {
-                question: "43. Refer to the exhibit. ...Which statement describes the effect after the commands are issued on SW1 and SW2? (SW1 is 'on', SW2 is 'desirable')",
-                options: [
-                    "The EtherChannel is established after SW1 initiates the link request",
-                    "The EtherChannel is established after SW2 initiates the link request",
-                    "The EtherChannel is established without negotiation",
-                    "The EtherChannel fails to establish"
-                ],
-                answer: "The EtherChannel fails to establish"
-            },
-            {
-                question: "44. Refer to the exhibit. ...What is the missing parameter that is shown as the highlighted question mark in the graphic? (encapsulation dot1q ?)",
-                options: [
-                    "It identifies the subinterface",
-                    "It identifies the VLAN number",
-                    "It identifies the native VLAN number",
-                    "It identifies the type of encapsulation that is used",
-                    "It identifies the number of hosts that are allowed on the interface"
-                ],
-                answer: "It identifies the VLAN number"
-            },
-            {
-                question: "45. Refer to the exhibit. ...Host1, Host2, and Host3 cannot communicate with each other. Based on the router configuration, what is causing the problem?",
-                options: [
-                    "Interface Fa0/0 is missing IP address configuration information",
-                    "IP addresses on the subinterfaces are incorrectly matched to the VLANs",
-                    "Each subinterface of Fa0/0 needs separate no shutdown commands",
-                    "Routers do not support 802.1Q encapsulation on subinterfaces"
-                ],
-                answer: "IP addresses on the subinterfaces are incorrectly matched to the VLANs"
-            },
-            {
-                question: "46. Refer to the exhibit. ...S2 show vlan brief... notices that interfaces Gi0/1 and Gi0/2 are not included in the output. Why...?",
-                options: [
-                    "There is a native VLAN mismatch between the switches",
-                    "There is no media connected to the interfaces",
-                    "They are administratively shut down",
-                    "They are configured as trunk interfaces"
-                ],
-                answer: "They are configured as trunk interfaces"
-            },
-            {
-                question: "47. Refer to the exhibit. ...PC2 cannot communicate with PC1. Based on the output, what is the possible cause of the problem?",
-                options: [
-                    "Gi0/0 is not configured as a trunk port",
-                    "The command interface GigabitEthernet0/0.5 was entered incorrectly",
-                    "There is no IP address configured on the interface Gi0/0",
-                    "The no shutdown command is not entered on subinterfaces",
-                    "The encapsulation dot1Q 5 command contains the wrong VLAN"
-                ],
-                answer: "The encapsulation dot1Q 5 command contains the wrong VLAN"
-            },
-            {
-                question: "48. Refer to the exhibit. ...what are two configuration errors on switch interface Gi1/1? (Note: This is a 'select two' question, answer will be one of the errors)",
-                options: [
-                    "Gi1/1 is in the default VLAN and Gi1/1 is configured as trunk mode",
-                    "Voice VLAN is not assigned to Gi1/1",
-                    "Negotiation of trunking is turned on on Gi1/1",
-                    "The trunking encapsulation protocol is configured wrong"
-                ],
-                answer: "Gi1/1 is in the default VLAN and Gi1/1 is configured as trunk mode"
-            },
-            {
-                question: "49. Refer to the exhibit. ...show etherchannel summary... What conclusion can be drawn? (Ports are 'I' - stand-alone)",
-                options: [
-                    "The EtherChannel is suspended",
-                    "The EtherChannel is not functional",
-                    "The port aggregation protocol PAgP is misconfigured",
-                    "FastEthernet ports Fa0/1, Fa0/2, and Fa0/3 do not join the EtherChannel"
-                ],
-                answer: "FastEthernet ports Fa0/1, Fa0/2, and Fa0/3 do not join the EtherChannel"
-            },
-            {
-                question: "50. Refer to the exhibit. ...How many subinterfaces will have to be created on the router...?",
-                options: [
-                    "1",
-                    "2",
-                    "3",
-                    "4"
-                ],
-                answer: "4"
-            },
-            {
-                question: "51. Refer to the exhibit. ...PCs on VLAN 45... cannot connecting to PCs on VLAN 30... Which error is most likely causing this problem?",
-                options: [
-                    "The wrong VLAN has been configured on GigabitEthernet 0/0.45",
-                    "The command no shutdown is missing on GigabitEthernet 0/0.30",
-                    "The GigabitEthernet 0/0 interface is missing an IP address",
-                    "There is an incorrect IP address configured on GigabitEthernet 0/0.30"
-                ],
-                answer: "There is an incorrect IP address configured on GigabitEthernet 0/0.30"
-            },
-            {
-                question: "52. Refer to the exhibit. ...What, if anything, is wrong with the configuration? (access vlan 35, then access vlan 150)",
-                options: [
-                    "There is nothing wrong with the configuration",
-                    "Interface Fa0/20 can only have one VLAN assigned.",
-                    "The mls qos trust cos command should reference VLAN 35",
-                    "The command used to assign the voice VLAN to the switch port is incorrect"
-                ],
-                answer: "The command used to assign the voice VLAN to the switch port is incorrect"
-            },
-            {
-                question: "53. Refer to the exhibit. ...Workstations on SW1 are not able to send traffic to workstations on SW2. What could be done...? (VLANS Enabled: 2-10, 30-50)",
-                options: [
-                    "Allow VLAN 20 on the trunk link",
-                    "Enable DTP on both ends of the trunk",
-                    "Configure all workstations on SW1 to be part of the default VLAN",
-                    "Configure all workstations on SW2 to be part of the native VLAN"
-                ],
-                answer: "Allow VLAN 20 on the trunk link"
-            },
-            {
-                question: "54. Refer to the exhibit. ...S1 is configured to be in auto mode, which mode should be configured on S2 to form the EtherChannel? (PAgP)",
-                options: [
-                    "auto",
-                    "on",
-                    "off",
-                    "desirable"
-                ],
-                answer: "desirable"
-            },
-            {
-                question: "55. Refer to the exhibit. ...What is the problem? (S1: vlan 1-5,10, S2: vlan 1,5,10)",
-                options: [
-                    "The interface port-channel number has to be different on each switch",
-                    "The switch ports were not configured with speed and duplex mode",
-                    "The switch ports have to be configured as access ports with each port having a VLAN assigned",
-                    "The EtherChannel was not configured with the same allowed range of VLANs on each interface"
-                ],
-                answer: "The EtherChannel was not configured with the same allowed range of VLANs on each interface"
-            },
-            {
-                question: "56. Refer to the exhibit. ...what can be determined about the EtherChannel bundle? (Po1(SU), PAgP, Fa0/1(P) Fa0/2(P))",
-                options: [
-                    "The EtherChannel bundle is down",
-                    "Two Gigabit Ethernet ports are used to form the EtherChannel",
-                    "A Cisco proprietary protocol was used to negotiate the EtherChannel link",
-                    "The EtherChannel bundle is operating at both Layer 2 and Layer 3"
-                ],
-                answer: "A Cisco proprietary protocol was used to negotiate the EtherChannel link"
-            },
-            {
-                question: "57. Refer to the exhibit. How many broadcast domains are displayed?",
-                options: [
-                    "1",
-                    "4",
-                    "8",
-                    "16"
-                ],
-                answer: "8"
-            },
-            {
-                question: "58. Refer to the exhibit. In what switch mode should port G0/1 be assigned if Cisco best practices are being used? (Link to router for multiple VLANs)",
-                options: [
-                    "access",
-                    "trunk",
-                    "native",
-                    "auto"
-                ],
-                answer: "trunk"
-            },
-            {
-                question: "59. Refer to the exhibit. ...What conclusion can be made based on the output of this command? (show trunk lists G0/1, but topology also has G0/2)",
-                options: [
-                    "Interface G0/2 is not configured as a trunk",
-                    "VLAN 20 has not been created",
-                    "The encapsulation on interface G0/1 is incorrect",
-                    "The DTP mode is incorrectly set to dynamic auto on interface G0/1"
-                ],
-                answer: "Interface G0/2 is not configured as a trunk"
-            },
-            {
-                question: "60. Refer to the exhibit. ...What is the problem? (Bundling ports 1-4, where 1-2 go to S2 and 3-4 go to S3)",
-                options: [
-                    "Traffic cannot be sent to two different switches through the same EtherChannel link",
-                    "Traffic cannot be sent to two different switches, but only to two different devices like an EtherChannel-enabled server and a switch",
-                    "Traffic can only be sent to two different switches if EtherChannel is implemented on Gigabit Ethernet interfaces",
-                    "Traffic can only be sent to two different switches if EtherChannel is implemented on Layer 3 switches"
-                ],
-                answer: "Traffic cannot be sent to two different switches through the same EtherChannel link"
-            },
-            {
-                question: "61. Refer to the exhibit. ...How should the network administrator change the displayed configuration to satisfy the requirement? (Prohibit Telnet)",
-                options: [
-                    "Use SSH version 1",
-                    "Reconfigure the RSA key",
-                    "Configure SSH on a different line",
-                    "Modify the transport input command"
-                ],
-                answer: "Modify the transport input command"
-            },
-            {
-                question: "62. Refer to the exhibit. What are the possible port roles for ports A, B, C, and D in this RSTP-enabled network? (S1 is Root)",
-                options: [
-                    "alternate, designated, root, root",
-                    "designated, alternate, root, root",
-                    "alternate, root, designated, root",
-                    "designated, root, alternate, root"
-                ],
-                answer: "alternate, designated, root, root"
-            },
-            {
-                question: "63. Refer to the exhibit. What is the cause of the error that is displayed... (Error after 'ip address' command on subinterface)",
-                options: [
-                    "The gig0/0 interface does not support inter-VLAN routing",
-                    "The no shutdown command has not been configured",
-                    "The IP address on CiscoVille is incorrect",
-                    "The encapsulation dot1Q 20 command has not been configured"
-                ],
-                answer: "The encapsulation dot1Q 20 command has not been configured"
-            },
-            {
-                question: "64. Refer to the exhibit. Which switch will be the root bridge after the election process is complete?",
-                options: [
-                    "S1",
-                    "S2",
-                    "S3",
-                    "S4"
-                ],
-                answer: "S2"
-            },
-            {
-                question: "65. Refer to the exhibit. Which switching technology would allow each access layer switch link to be aggregated...?",
-                options: [
-                    "trunking",
-                    "HSRP",
-                    "PortFast",
-                    "EtherChannel"
-                ],
-                answer: "EtherChannel"
-            },
-            {
-                question: "66. Under which occasion should an administrator disable DTP while managing a local area network?",
-                options: [
-                    "when a neighbor switch uses a DTP mode of dynamic auto",
-                    "when a neighbor switch uses a DTP mode of dynamic desirable",
-                    "on links that should not be trunking",
-                    "on links that should dynamically attempt trunking"
-                ],
-                answer: "on links that should not be trunking"
-            },
-            {
-                question: "67. What additional information is contained in the 12-bit extended system ID of a BPDU?",
-                options: [
-                    "MAC address",
-                    "VLAN ID",
-                    "IP address",
-                    "port ID"
-                ],
-                answer: "VLAN ID"
-            },
-            {
-                question: "69. What does a switch use to locate and load the IOS image?",
-                options: [
-                    "BOOT environment variable",
-                    "IOS image file",
-                    "POST",
-                    "startup-config"
-                ],
-                answer: "BOOT environment variable"
-            },
-            {
-                question: "70. What happens to switch ports after the VLAN to which they are assigned is deleted?",
-                options: [
-                    "The ports are disabled.",
-                    "The ports are placed in trunk mode.",
-                    "The ports are assigned to VLAN1, the default VLAN.",
-                    "The ports stop communicating with the attached devices."
-                ],
-                answer: "The ports stop communicating with the attached devices."
-            },
-            {
-                question: "71. What information is added to the switch table from incoming frames?",
-                options: [
-                    "source MAC address and incoming port number",
-                    "destination MAC address and incoming port number",
-                    "source IP address and incoming port number",
-                    "destination IP address and incoming port number"
-                ],
-                answer: "source MAC address and incoming port number"
-            },
-            {
-                question: "72. What is a characteristic of an IPv4 loopback interface on a Cisco IOS router?",
-                options: [
-                    "The no shutdown command is required to place this interface in an UP state.",
-                    "It is a logical interface internal to the router.",
-                    "Only one loopback interface can be enabled on a router.",
-                    "It is assigned to a physical port and can be connected to other devices."
-                ],
-                answer: "It is a logical interface internal to the router."
-            },
-            {
-                question: "73. What is a characteristic of spanning tree?",
-                options: [
-                    "It is enabled by default on Cisco switches.",
-                    "It is used to discover information about an adjacent Cisco device.",
-                    "It has a TTL mechanism that works at Layer 2.",
-                    "It prevents propagation of Layer 2 broadcast frames."
-                ],
-                answer: "It is enabled by default on Cisco switches."
-            },
-            {
-                question: "74. What is a requirement to configure a trunking EtherChannel between two switches?",
-                options: [
-                    "The allowed range of VLANs must be the same on both switches.",
-                    "The participating interfaces must be assigned the same VLAN number on both switches.",
-                    "The participating interfaces must be physically contiguous on a switch.",
-                    "The participating interfaces must be on the same module on a switch."
-                ],
-                answer: "The allowed range of VLANs must be the same on both switches."
-            },
-            {
-                question: "75. What is the advantage of EtherChannel?",
-                options: [
-                    "Spanning Tree Protocol views the physical links in an EtherChannel as one logical connection and provides consistency in the configuration of the physical links.",
-                    "Load balancing occurs between links configured as different EtherChannels.",
-                    "Spanning Tree Protocol ensures redundancy by transitioning failed interfaces in an EtherChannel to a forwarding state.",
-                    "EtherChannel uses upgraded physical links to provide increased bandwidth."
-                ],
-                answer: "Spanning Tree Protocol views the physical links in an EtherChannel as one logical connection and provides consistency in the configuration of the physical links."
-            },
-            {
-                question: "76. What is the advantage of using LACP?",
-                options: [
-                    "It allows directly connected switches to negotiate an EtherChannel link and the use of multivendor devices.",
-                    "It eliminates the need for configuring trunk interfaces when deploying VLANs on multiple switches.",
-                    "It decreases the amount of configuration that is needed on a switch.",
-                    "It provides a simulated environment for testing link aggregation.",
-                    "LACP allows Fast Ethernet and Gigabit Ethernet interfaces to be mixed within a single EtherChannel."
-                ],
-                answer: "It allows directly connected switches to negotiate an EtherChannel link and the use of multivendor devices."
-            },
-            {
-                question: "77. What is the drawback to turning spanning tree off and having multiple paths through the Layer 2 switch network?",
-                options: [
-                    "The switch acts like a hub.",
-                    "Port security becomes unstable.",
-                    "Broadcast frames are transmitted indefinitely.",
-                    "Port security shuts down all of the ports that have attached devices."
-                ],
-                answer: "Broadcast frames are transmitted indefinitely."
-            },
-            {
-                question: "78. What is the first action in the boot sequence when a switch is powered on?",
-                options: [
-                    "load the default Cisco IOS software",
-                    "load boot loader software",
-                    "low-level CPU initialization",
-                    "load a power-on self-test program"
-                ],
-                answer: "load a power-on self-test program"
-            },
-            {
-                question: "79. What is the function of STP in a scalable network?",
-                options: [
-                    "It decreases the size of the failure domain to contain the impact of failures.",
-                    "It protects the edge of the enterprise network from malicious activity.",
-                    "It combines multiple switch trunk links to act as one logical link for increased bandwidth.",
-                    "It disables redundant paths to eliminate Layer 2 loops."
-                ],
-                answer: "It disables redundant paths to eliminate Layer 2 loops."
-            },
-            {
-                question: "80. What is the minimum Ethernet frame size that will not be discarded by the receiver as a runt frame?",
-                options: [
-                    "64 bytes",
-                    "512 bytes",
-                    "1024 bytes",
-                    "1500 bytes"
-                ],
-                answer: "64 bytes"
-            },
-            {
-                question: "81. What is the outcome of a Layer 2 broadcast storm?",
-                options: [
-                    "Routers will take over the forwarding of frames as switches become congested.",
-                    "New traffic is discarded by the switch because it is unable to be processed.",
-                    "CSMA/CD will cause each host to continue transmitting frames.",
-                    "ARP broadcast requests are returned to the transmitting host."
-                ],
-                answer: "New traffic is discarded by the switch because it is unable to be processed."
-            },
-            {
-                question: "82. What is the purpose of the Spanning Tree Protocol (STP)?",
-                options: [
-                    "creates smaller collision domains",
-                    "prevents routing loops on a router",
-                    "prevents Layer 2 loops",
-                    "allows Cisco devices to exchange routing table updates"
-                ],
-                answer: "prevents Layer 2 loops"
-            },
-            {
-                question: "83. What is the requirement to be able to configure an EtherChannel between two switches?",
-                options: [
-                    "All the interfaces need to work at the same speed and the same duplex mode.",
-                    "All interfaces need to be assigned to different VLANs.",
-                    "Different allowed ranges of VLANs must exist on each end.",
-                    "The interfaces that are involved need to be contiguous on the switch."
-                ],
-                answer: "All the interfaces need to work at the same speed and the same duplex mode."
-            },
-            {
-                question: "84. What is the significant difference between a hub and a Layer 2 LAN switch?",
-                options: [
-                    "A hub extends a collision domain, and a switch divides collision domains.",
-                    "A hub divides collision domains, and a switch divides broadcast domains.",
-                    "Each port of a hub is a collision domain, and each port of a switch is a broadcast domain.",
-                    "A hub forwards frames, and a switch forwards only packets."
-                ],
-                answer: "A hub extends a collision domain, and a switch divides collision domains."
-            },
-            {
-                question: "85. What is the value used to determine which port on a non-root bridge will become a root port in a STP network?",
-                options: [
-                    "the path cost",
-                    "the highest MAC address of all the ports in the switch",
-                    "the lowest MAC address of all the ports in the switch",
-                    "the VTP revision number"
-                ],
-                answer: "the path cost"
-            },
-            {
-                question: "86. What must an administrator have to reset a lost password on a router?",
-                options: [
-                    "a TFTP server",
-                    "a crossover cable",
-                    "access to another router",
-                    "physical access to the router"
-                ],
-                answer: "physical access to the router"
-            },
-            {
-                question: "87. What type of VLAN is configured specifically for network traffic such as SSH, Telnet, HTTPS, HTTP, and SNMP?",
-                options: [
-                    "management VLAN",
-                    "security VLAN",
-                    "trunk VLAN",
-                    "voice VLAN"
-                ],
-                answer: "management VLAN"
-            },
-            {
-                question: "88. What type of VLAN is configured specifically for network traffic such as SSH, Telnet, HTTPS, HHTP, and SNMP?",
-                options: [
-                    "voice VLAN",
-                    "management VLAN",
-                    "native VLAN",
-                    "security VLAN"
-                ],
-                answer: "management VLAN"
-            },
-            {
-                question: "89. What type of VLAN is designed to have a delay of less than 150 ms across the network?",
-                options: [
-                    "voice VLAN",
-                    "desirable VLAN",
-                    "trunk VLAN",
-                    "security VLAN"
-                ],
-                answer: "voice VLAN"
-            },
-            {
-                question: "90. What type of VLAN is designed to reserve bandwidth to ensure IP Phone quality?",
-                options: [
-                    "voice VLAN",
-                    "trunk VLAN",
-                    "security VLAN",
-                    "management VLAN"
-                ],
-                answer: "voice VLAN"
-            },
-            {
-                question: "91. What type of VLAN is initially the management VLAN?",
-                options: [
-                    "default VLAN",
-                    "native VLAN",
-                    "data VLAN",
-                    "management VLAN"
-                ],
-                answer: "default VLAN"
-            },
-            {
-                question: "92. What type of VLAN is used to separate the network into groups of users or devices?",
-                options: [
-                    "data VLAN",
-                    "management VLAN",
-                    "voice VLAN",
-                    "native VLAN"
-                ],
-                answer: "data VLAN"
-            },
-            {
-                question: "93. What type of VLAN should not carry voice and network management traffic?",
-                options: [
-                    "data VLAN",
-                    "voice VLAN",
-                    "management VLAN",
-                    "security VLAN"
-                ],
-                answer: "data VLAN"
-            },
-            {
-                question: "94. What type of VLAN supports untagged traffic?",
-                options: [
-                    "native VLAN",
-                    "voice VLAN",
-                    "security VLAN",
-                    "management VLAN"
-                ],
-                answer: "native VLAN"
-            },
-            {
-                question: "95. What type of VLAN supports untagHged traffic?",
-                options: [
-                    "native VLAN",
-                    "desirable VLAN",
-                    "trunk VLAN",
-                    "security VLAN"
-                ],
-                answer: "native VLAN"
-            },
-            {
-                question: "96. When configuring a switch for SSH access, what other command that is associated with the login local command is required to be entered on the switch?",
-                options: [
-                    "enable secret password",
-                    "password password",
-                    "username username secret secret",
-                    "login block-for seconds attempts number within*seconds*"
-                ],
-                answer: "username username secret secret"
-            },
-            {
-                question: "97. When EtherChannel is configured, which mode will force an interface into a port channel without exchanging aggregation protocol packets?",
-                options: [
-                    "active",
-                    "auto",
-                    "on",
-                    "desirable"
-                ],
-                answer: "on"
-            },
-            {
-                question: "99. When the show spanning-tree vlan 33 command is issued on a switch, three ports are shown in the forwarding state. In which port roles could these interfaces function while in the forwarding state?",
-                options: [
-                    "alternate",
-                    "designated",
-                    "disabled",
-                    "blocked"
-                ],
-                answer: "designated"
-            },
-            {
-                question: "100. Which channel group modes would place an interface in a negotiating state using PAgP?",
-                options: [
-                    "On and auto",
-                    "Desirable and auto",
-                    "Active and On",
-                    "Passive and desirable"
-                ],
-                answer: "Desirable and auto"
-            },
-            {
-                question: "101. Which characteristic describes cut-through switching?",
-                options: [
-                    "Error-free fragments are forwarded, so switching occurs with lower latency.",
-                    "Frames are forwarded without any error checking.",
-                    "Only outgoing frames are checked for errors.",
-                    "Buffering is used to support different Ethernet speeds."
-                ],
-                answer: "Frames are forwarded without any error checking."
-            },
-            {
-                question: "102. Which characteristics describe the native VLAN?",
-                options: [
-                    "Designed to carry traffic that is generated by users, this type of VLAN is also known as the default VLAN.",
-                    "The native VLAN traffic will be untagged across the trunk link.",
-                    "This VLAN is necessary for remote management of a switch.",
-                    "High priority traffic, such as voice traffic, uses the native VLAN."
-                ],
-                answer: "The native VLAN traffic will be untagged across the trunk link."
-            },
-            {
-                question: "103. Which command displays information about the auto-MDIX setting for a specific interface?",
-                options: [
-                    "show interfaces",
-                    "show controllers",
-                    "show processes",
-                    "show running-config"
-                ],
-                answer: "show controllers"
-            },
-            {
-                question: "104. Which command displays the encapsulation type, the voice VLAN ID, and the access mode VLAN for the Fa0/1 interface?",
-                options: [
-                    "show vlan brief",
-                    "show interfaces Fa0/1 switchport",
-                    "show mac address-table interface Fa0/1",
-                    "show interfaces trunk"
-                ],
-                answer: "show interfaces Fa0/1 switchport"
-            },
-            {
-                question: "105. Which command is used to set the BOOT environment variable that defines where to find the IOS image file on a switch?",
-                options: [
-                    "config-register",
-                    "boot system",
-                    "boot loader",
-                    "confreg"
-                ],
-                answer: "boot system"
-            },
-            {
-                question: "106. Which components are combined to form a bridge ID?",
-                options: [
-                    "extended system ID, bridge priority, and MAC address",
-                    "cost and MAC address",
-                    "IP address and system ID",
-                    "port ID and IP address"
-                ],
-                answer: "extended system ID, bridge priority, and MAC address"
-            },
-            {
-                question: "107. Which concept relate to a switch port that is intended to have only end devices attached and intended never to be used to connect to another switch?",
-                options: [
-                    "bridge ID",
-                    "extended system ID",
-                    "PortFast",
-                    "PVST+"
-                ],
-                answer: "PortFast"
-            },
-            {
-                question: "108. Which impact does adding a Layer 2 switch have on a network?",
-                options: [
-                    "an increase in the number of dropped frames",
-                    "an increase in the size of the broadcast domain",
-                    "an increase in the number of network collisions",
-                    "an increase in the size of the collision domain"
-                ],
-                answer: "an increase in the size of the broadcast domain"
-            },
-            {
-                question: "109. Which mode configuration setting would allow formation of an EtherChannel link between switches SW1 and SW2 without sending negotiation traffic?",
-                options: [
-                    "SW1: on SW2: on",
-                    "SW1: desirable SW2: desirable",
-                    "SW1: auto SW2: auto trunking enabled on both switches",
-                    "SW1: auto SW2: auto PortFast enabled on both switches"
-                ],
-                answer: "SW1: on SW2: on"
-            },
-            {
-                question: "110. Which network design feature require Spanning Tree Protocol (STP) to ensure correct network operation?",
-                options: [
-                    "static default routes",
-                    "implementing VLANs to contain broadcasts",
-                    "redundant links between Layer 2 switches",
-                    "link-state dynamic routing that provides redundant routes"
-                ],
-                answer: "redundant links between Layer 2 switches"
-            },
-            {
-                question: "111. Which parameter must match on the ports of two switches to create a PAgP EtherChannel between the switches?",
-                options: [
-                    "port ID",
-                    "PAgP mode",
-                    "MAC address",
-                    "Speed and VLAN information"
-                ],
-                answer: "Speed and VLAN information"
-            },
-            {
-                question: "112. Which port role is assigned to the switch port that has the lowest cost to reach the root bridge?",
-                options: [
-                    "designated port",
-                    "disabled port",
-                    "root port",
-                    "non-designated port"
-                ],
-                answer: "root port"
-            },
-            {
-                question: "113. Which protocol adds security to remote connections?",
-                options: [
-                    "FTP",
-                    "HTTP",
-                    "NetBEUI",
-                    "SSH"
-                ],
-                answer: "SSH"
-            },
-            {
-                question: "114. Which protocol provides up to 16 instances of RSTP, combines many VLANs with the same physical and logical topology into a common RSTP instance...?",
-                options: [
-                    "STP",
-                    "Rapid PVST+",
-                    "PVST+",
-                    "MST"
-                ],
-                answer: "MST"
-            },
-            {
-                question: "115. Which solution would help a college alleviate network congestion due to collisions?",
-                options: [
-                    "a firewall that connects to two Internet providers",
-                    "a high port density switch",
-                    "a router with two Ethernet ports",
-                    "a router with three Ethernet ports"
-                ],
-                answer: "a high port density switch"
-            },
-            {
-                question: "116. Which spanning tree standard supports only one root bridge so that traffic from all VLANs flows over the same path?",
-                options: [
-                    "PVST+",
-                    "802.1D",
-                    "MST",
-                    "Rapid PVST"
-                ],
-                answer: "802.1D"
-            },
-            {
-                question: "117. Which statement describes a characteristic of EtherChannel?",
-                options: [
-                    "It can combine up to a maximum of 4 physical links.",
-                    "It can bundle mixed types of 100 Mb/s and 1Gb/s Ethernet links.",
-                    "It consists of multiple parallel links between a switch and a router.",
-                    "It is made by combining multiple physical links that are seen as one link between two switches."
-                ],
-                answer: "It is made by combining multiple physical links that are seen as one link between two switches."
-            },
-            {
-                question: "118. Which statement describes an EtherChannel implementation?",
-                options: [
-                    "EtherChannel operates only at Layer 2.",
-                    "PAgP cannot be used in conjunction with EtherChannel.",
-                    "A trunked port can be part of an EtherChannel bundle.",
-                    "EtherChannel can support up to a maximum of ten separate links."
-                ],
-                answer: "A trunked port can be part of an EtherChannel bundle."
-            },
-            {
-                question: "119. Which statement is correct about Ethernet switch frame forwarding decisions?",
-                options: [
-                    "Frame forwarding decisions are based on MAC address and port mappings in the CAM table.",
-                    "Cut-through frame forwarding ensures that invalid frames are always dropped.",
-                    "Only frames with a broadcast destination address are forwarded out all active switch ports.",
-                    "Unicast frames are always forwarded regardless of the destination MAC address."
-                ],
-                answer: "Frame forwarding decisions are based on MAC address and port mappings in the CAM table."
-            },
-            {
-                question: "120. Which statement is correct with respect to SVI inter-VLAN routing?",
-                options: [
-                    "There is no need for a connection to a router.",
-                    "Virtual interfaces support subinterfaces.",
-                    "SVIs can be bundled into EtherChannels.",
-                    "SVIs eliminate the need for a default gateway in the hosts."
-                ],
-                answer: "There is no need for a connection to a router."
-            },
-            {
-                question: "121. Which statement is true regarding the use of PAgP to create EtherChannels?",
-                options: [
-                    "It requires full duplex.",
-                    "It increases the number of ports that are participating in spanning tree.",
-                    "It requires more physical links than LACP does.",
-                    "It is Cisco proprietary."
-                ],
-                answer: "It is Cisco proprietary."
-            },
-            {
-                question: "122. Which STP port role is adopted by a switch port if there is no other port with a lower cost to the root bridge?",
-                options: [
-                    "designated port",
-                    "root port",
-                    "alternate",
-                    "disabled port"
-                ],
-                answer: "root port"
-            },
-            {
-                question: "123. Which switch characteristic helps keep traffic local and alleviates network congestion?",
-                options: [
-                    "high port density",
-                    "fast port speed",
-                    "large frame buffers",
-                    "fast internal switching"
-                ],
-                answer: "fast internal switching"
-            },
-            {
-                question: "124. Which switch component reduces the amount of packet handling time inside the switch?",
-                options: [
-                    "ASIC",
-                    "dual processors",
-                    "large buffer size",
-                    "store-and-forward RAM"
-                ],
-                answer: "ASIC"
-            },
-            {
-                question: "125. Which switching method ensures that the incoming frame is error-free before forwarding?",
-                options: [
-                    "cut-through",
-                    "FCS",
-                    "fragment free",
-                    "store-and-forward"
-                ],
-                answer: "store-and-forward"
-            },
-            {
-                question: "126. Which tasks can be accomplished by using the command history feature?",
-                options: [
-                    "View a list of commands entered in a previous session.",
-                    "Recall up to 15 command lines by default.",
-                    "Save command lines in a log file for future reference.",
-                    "Recall previously entered commands and set the command history buffer size."
-                ],
-                answer: "Recall previously entered commands and set the command history buffer size."
-            },
-            {
-                question: "127. Which technology is an open protocol standard that allows switches to automatically bundle physical ports into a single logical link?",
-                options: [
-                    "PAgP",
-                    "LACP",
-                    "Multilink PPP",
-                    "DTP"
-                ],
-                answer: "LACP"
-            },
-            {
-                question: "128. Which type of VLAN is used to designate which traffic is untagged when crossing a trunk port?",
-                options: [
-                    "data",
-                    "default",
-                    "native",
-                    "management"
-                ],
-                answer: "native"
-            }
-        ];
-
-        // *** FIX: Wrap all DOM interaction code inside DOMContentLoaded listener ***
-        // بدء الاختبار عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // --- 2. جلب عناصر الصفحة ---
-            const quizView = document.getElementById('quiz-view');
-            const resultsView = document.getElementById('results-view');
-            const questionText = document.getElementById('question-text');
-            const optionsContainer = document.getElementById('options-container');
-            const feedback = document.getElementById('feedback');
-            const nextBtn = document.getElementById('next-btn');
-            const progressText = document.getElementById('progress');
-            
-            const scoreText = document.getElementById('score');
-            const summaryText = document.getElementById('summary');
-            const restartBtn = document.getElementById('restart-btn');
-
-            // --- 3. متغيرات حالة الاختبار ---
-            let questions = []; // ستُملأ بنسخة مبعثرة من الأسئلة
-            let currentQuestionIndex = 0;
-            let score = 0;
-
-            // --- 4. الوظائف الأساسية ---
-
-            /**
-             * وظيفة لبدء الاختبار أو إعادة تشغيله
-             */
-            function startQuiz() {
-                // إعادة تعيين
-                currentQuestionIndex = 0;
-                score = 0;
-                
-                // خلط الأسئلة
-                questions = shuffleArray([...allQuestions]);
-                
-                // إظهار واجهة الاختبار وإخفاء النتائج
-                quizView.classList.remove('hidden');
-                resultsView.classList.add('hidden');
-                
-                // تحميل أول سؤال
-                loadQuestion();
-            }
-
-            /**
-             * وظيفة لتحميل السؤال الحالي وخياراته
-             */
-            function loadQuestion() {
-                // التحقق إذا انتهت الأسئلة
-                if (currentQuestionIndex >= questions.length) {
-                    showResults();
-                    return;
-                }
-
-                // إعادة تعيين الواجهة
-                feedback.textContent = '';
-                nextBtn.classList.add('hidden');
-                optionsContainer.innerHTML = '';
-
-                // جلب السؤال الحالي
-                const currentQuestion = questions[currentQuestionIndex];
-
-                // عرض نص السؤال والتقدم
-                questionText.textContent = currentQuestion.question;
-                progressText.textContent = `السؤال ${currentQuestionIndex + 1} / ${questions.length}`;
-
-                // ----> ** التعديل الجديد: خلط ترتيب الخيارات ** <----
-                const shuffledOptions = shuffleArray([...currentQuestion.options]);
-
-                // إنشاء أزرار الخيارات (باستخدام الخيارات المخلوطة)
-                shuffledOptions.forEach(option => {
-                    const button = document.createElement('button');
-                    button.textContent = option;
-                    button.classList.add('option-btn', 'w-full', 'text-left', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'transition-colors', 'duration-150');
-                    
-                    // إضافة مستمع الحدث للتحقق من الإجابة
-                    button.addEventListener('click', () => {
-                        selectAnswer(button, option, currentQuestion.answer);
-                    });
-                    
-                    optionsContainer.appendChild(button);
-                });
-            }
-
-            /**
-             * وظيفة عند اختيار إجابة
-             */
-            function selectAnswer(selectedButton, selectedOption, correctAnswer) {
-                // تعطيل جميع الأزرار
-                Array.from(optionsContainer.children).forEach(btn => {
-                    btn.disabled = true;
-                    // تمييز الإجابة الصحيحة
-                    if (btn.textContent === correctAnswer) {
-                        btn.classList.add('correct-answer');
-                    }
-                });
-
-                // التحقق من إجابة المستخدم
-                if (selectedOption === correctAnswer) {
-                    score++;
-                    feedback.textContent = 'إجابة صحيحة!';
-                    feedback.classList.add('text-green-600');
-                    feedback.classList.remove('text-red-600');
-                } else {
-                    // تمييز الإجابة الخاطئة (إذا لم تكن هي نفسها الصحيحة)
-                    selectedButton.classList.add('incorrect-answer');
-                    // ** التعديل: إظهار الإجابة الصحيحة عند الخطأ **
-                    feedback.textContent = `إجابة خاطئة. الإجابة الصحيحة هي: "${correctAnswer}"`;
-                    feedback.classList.add('text-red-600');
-                    feedback.classList.remove('text-green-600');
-                }
-
-                // إظهار زر "التالي"
-                nextBtn.classList.remove('hidden');
-            }
-
-            /**
-             * وظيفة لإظهار النتائج النهائية
-             */
-            function showResults() {
-                // إخفاء واجهة الاختبار وإظهار النتائج
-                quizView.classList.add('hidden');
-                resultsView.classList.remove('hidden');
-
-                const percentage = ((score / questions.length) * 100).toFixed(1);
-                scoreText.textContent = `نتيجتك هي: ${score} من ${questions.length} (${percentage}%)`;
-
-                let summary = 'أداء رائع!';
-                if (percentage < 50) {
-                    summary = 'تحتاج إلى المزيد من المراجعة.';
-                } else if (percentage < 80) {
-                    summary = 'أداء جيد، استمر!';
-                }
-                summaryText.textContent = summary;
-            }
-
-            /**
-             * وظيفة مساعدة لخلط المصفوفة (خوارزمية Fisher-Yates)
-             */
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
-
-            // --- 5. ربط مستمعي الأحداث ---
-
-            // عند النقر على "التالي"
-            nextBtn.addEventListener('click', () => {
-                currentQuestionIndex++;
-                loadQuestion();
-            });
-
-            // عند النقر على "إعادة الاختبار"
-            restartBtn.addEventListener('click', startQuiz);
-
-            // بدء الاختبار عند تحميل الصفحة
-            startQuiz();
-        
-        }); // <-- End of DOMContentLoaded listener
-
-    </script>
 </head>
-<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen">
 
-    <!-- حاوية الاختبار الرئيسية -->
-    <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-3xl">
-
-        <!-- واجهة الاختبار (تُخفى عند إظهار النتائج) -->
-        <div id="quiz-view">
-            <!-- معلومات التقدم -->
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-blue-700">اختبار الشبكات</h2>
-                <div id="progress" class="text-lg font-semibold text-gray-600"></div>
-            </div>
-
-            <!-- نص السؤال (محاذاة لليسار لأنه إنجليزي) -->
-            <div class="border-t border-b border-gray-200 py-6 mb-6">
-                <h3 id="question-text" class="text-xl md:text-2xl font-semibold text-left" dir="ltr">جاري تحميل السؤال...</h3>
-            </div>
-
-            <!-- حاوية الخيارات (محاذاة لليسار) -->
-            <div id="options-container" class="space-y-3" dir="ltr">
-                <!-- أزرار الخيارات تضاف هنا عبر جافاسكربت -->
-            </div>
-
-            <!-- رسالة التغذية الراجعة (صحيح/خطأ) -->
-            <div id="feedback" class="mt-5 text-lg font-bold text-center"></div>
-
-            <!-- زر "التالي" (يظهر بعد الإجابة) -->
-            <button id="next-btn" class="hidden mt-6 w-full bg-blue-600 text-white font-semibold py-3 px-5 rounded-lg text-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                السؤال التالي
-            </button>
+    <!-- واجهة المستخدم العلوية -->
+    <div id="ui-header" class="fixed top-0 w-full max-w-2xl flex justify-between items-center p-4 z-20 text-white transition-colors duration-1000">
+        <div class="flex items-center gap-2 bg-black/70 backdrop-blur px-4 py-2 rounded-full border border-gray-700">
+            <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+            <span class="text-sm font-bold text-gray-300" id="status-text">أنت غير متصل</span>
         </div>
-
-        <!-- واجهة النتائج (مخفية في البداية) -->
-        <div id="results-view" class="hidden text-center">
-            <h2 class="text-3xl font-bold mb-4 text-gray-800">انتهى الاختبار!</h2>
-            <p id="score" class="text-2xl font-semibold text-blue-700 mb-4">نتيجتك هي: 0 / 0</p>
-            <p id="summary" class="text-xl text-gray-600 mb-8">...</p>
-            <button id="restart-btn" class="w-full bg-green-600 text-white font-semibold py-3 px-5 rounded-lg text-lg hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-                إعادة الاختبار
-            </button>
+        <div class="text-right bg-black/50 backdrop-blur px-4 py-1 rounded-2xl border border-gray-800">
+            <div id="score" class="text-4xl lg:text-5xl font-black metallic-text">0</div>
+            <div class="text-xs text-gray-500 uppercase font-bold tracking-widest mt-1">أفضل نتيجة: <span id="highScore" class="text-gray-300">0</span></div>
         </div>
-
     </div>
 
+    <!-- رسالة تغيير المرحلة -->
+    <div id="level-up-msg" class="fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-black opacity-0 z-40 pointer-events-none text-center whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]">
+    </div>
+
+    <!-- حاوية اللعبة -->
+    <div class="game-container flex justify-center mt-16 lg:mt-0">
+        <div id="flash-overlay" class="absolute inset-0 pointer-events-none z-10 rounded-xl"></div>
+        <canvas id="gameCanvas" class="w-full"></canvas>
+
+        <!-- شاشة البداية -->
+        <div id="start-screen" class="absolute inset-0 bg-black/95 flex flex-col items-center justify-center p-8 text-center z-30 transition-all border border-gray-800 rounded-xl">
+            <div class="mb-6 relative">
+                <div class="absolute -inset-4 bg-gray-500/20 blur-xl rounded-full"></div>
+                <svg class="w-24 h-24 text-gray-300 relative" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h1 class="text-5xl font-black mb-2 text-white tracking-tight">Learnova <span class="metallic-text">Jump</span></h1>
+            <p class="text-gray-400 mb-8 text-base leading-relaxed max-w-xs mx-auto">تحدّى الجاذبية عبر 4 مراحل مختلفة.<br>اكسر رقمك القياسي الآن.</p>
+            <button id="start-btn" class="w-full max-w-sm bg-gradient-to-b from-gray-200 to-gray-400 hover:from-white hover:to-gray-300 text-black py-4 rounded-xl font-black text-xl shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all active:scale-95 border-b-4 border-gray-500">
+                ابدأ التحدي
+            </button>
+            <div class="mt-8 text-xs text-gray-600 flex gap-6 font-bold bg-gray-900 px-6 py-3 rounded-full">
+                <span>⌨️ الأسهم للتحرك</span>
+                <span>📱 أو المس الشاشة</span>
+            </div>
+        </div>
+
+        <!-- شاشة الخسارة -->
+        <div id="gameover-screen" class="absolute inset-0 bg-black/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-8 text-center z-30 border border-red-900/50 rounded-xl">
+            <h2 class="text-2xl font-bold text-gray-400 mb-2">سقطت في الهاوية!</h2>
+            <div id="final-score" class="text-8xl font-black metallic-text mb-8">0</div>
+            
+            <div id="phase-reached" class="mb-8 text-lg font-bold text-white px-4 py-2 rounded-lg bg-white/10 border border-white/20">
+                وصلت إلى: المرحلة الأولى
+            </div>
+
+            <button id="retry-btn" class="w-full max-w-sm bg-gradient-to-b from-gray-700 to-gray-900 text-white px-10 py-5 rounded-xl font-black text-xl shadow-2xl hover:from-gray-600 hover:to-gray-800 transition-all active:scale-95 flex justify-center items-center gap-3 border border-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                المحاولة مجدداً
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highScore');
+        const startScreen = document.getElementById('start-screen');
+        const gameoverScreen = document.getElementById('gameover-screen');
+        const startBtn = document.getElementById('start-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const levelUpMsg = document.getElementById('level-up-msg');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const phaseReachedEl = document.getElementById('phase-reached');
+
+        const PHASE_MILESTONES = {
+            2: 50,
+            3: 250,
+            4: 500
+        };
+
+        const PHASE_NAMES = {
+            1: "المرحلة الأولى (الكلاسيكية)",
+            2: "المرحلة الثانية (الخطر)",
+            3: "المرحلة الثالثة (النيون)",
+            4: "المرحلة الرابعة (الفراغ)"
+        };
+
+        let config = {
+            gravity: 0.35,      
+            jumpForce: -10.5,   
+            platformWidth: 110,
+            platformHeight: 16,
+            playerSize: 42,
+            initialPlatforms: 8,
+            gameSpeed: 0.8
+        };
+
+        let state = {
+            gameRunning: false,
+            score: 0,
+            highScore: localStorage.getItem('learnova_jump_best_v3') || 0,
+            phase: 1,
+            player: {},
+            platforms: [],
+            cameraY: 0,
+            keys: {}
+        };
+
+        highScoreEl.innerText = state.highScore;
+
+        function resizeCanvas() {
+            const container = document.querySelector('.game-container');
+            // حجم معقول ومتناسب مع الشاشات
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function initGame() {
+            resizeCanvas();
+
+            state.score = 0;
+            state.phase = 1;
+            state.cameraY = 0;
+            state.gameRunning = true;
+            
+            // إعادة تعيين إعدادات الفيزياء للمرحلة الأولى
+            config.gravity = 0.35;
+            config.gameSpeed = 0.8;
+            config.platformWidth = Math.min(120, canvas.width * 0.25);
+            config.jumpForce = -10.5;
+            
+            scoreEl.innerText = '0';
+            
+            state.player = {
+                x: canvas.width / 2 - config.playerSize / 2,
+                y: canvas.height - 180,
+                vx: 0,
+                vy: 0,
+                width: config.playerSize,
+                height: config.playerSize
+            };
+
+            state.platforms = [];
+            state.platforms.push({
+                x: state.player.x - 40,
+                y: state.player.y + 60,
+                width: 160,
+                height: config.platformHeight,
+                type: 'static'
+            });
+
+            for (let i = 1; i < config.initialPlatforms; i++) {
+                addPlatform(canvas.height - i * 140);
+            }
+
+            startScreen.classList.add('hidden');
+            gameoverScreen.classList.add('hidden');
+            
+            // تهيئة الخلفية
+            canvas.style.boxShadow = "0 0 50px rgba(255, 255, 255, 0.05)";
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        function addPlatform(y) {
+            let movingProb = 0;
+            let widthMultiplier = 1;
+            let baseSpeed = 0;
+
+            // هندسة الصعوبة حسب المرحلة
+            switch(state.phase) {
+                case 1: movingProb = 0.15; widthMultiplier = 1.0; baseSpeed = 2; break;
+                case 2: movingProb = 0.40; widthMultiplier = 0.8; baseSpeed = 4; break;
+                case 3: movingProb = 0.70; widthMultiplier = 0.6; baseSpeed = 6; break;
+                case 4: movingProb = 0.90; widthMultiplier = 0.4; baseSpeed = 8; break;
+            }
+
+            const type = Math.random() < movingProb ? 'moving' : 'static';
+            
+            // تقليل الحجم تدريجياً مع السكور داخل نفس المرحلة أيضاً
+            let width = Math.max(
+                (config.platformWidth * widthMultiplier) - ((state.score % 500) / 40), 
+                canvas.width * 0.1 // لا يقل عن 10% من الشاشة
+            );
+
+            state.platforms.push({
+                x: Math.random() * (canvas.width - width),
+                y: y,
+                width: width,
+                height: config.platformHeight,
+                type: type,
+                speed: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 2 + baseSpeed),
+                visited: false
+            });
+        }
+
+        function triggerPhase(newPhase) {
+            state.phase = newPhase;
+            
+            let message = "";
+            let msgColor = "";
+
+            if (newPhase === 2) {
+                config.gameSpeed = 1.5; 
+                config.gravity = 0.45; 
+                config.jumpForce = -12.5;
+                message = "مرحلة الخطر! 🔥";
+                msgColor = "text-red-500";
+                canvas.style.boxShadow = "0 0 50px rgba(239, 68, 68, 0.2)";
+            } 
+            else if (newPhase === 3) {
+                config.gameSpeed = 2.5; 
+                config.gravity = 0.55; 
+                config.jumpForce = -14;
+                message = "مرحلة النيون! ⚡";
+                msgColor = "text-cyan-400";
+                canvas.style.boxShadow = "0 0 50px rgba(34, 211, 238, 0.3)";
+            }
+            else if (newPhase === 4) {
+                config.gameSpeed = 4.0; 
+                config.gravity = 0.7; 
+                config.jumpForce = -16;
+                message = "الفراغ المظلم! 🕳️";
+                msgColor = "text-purple-500";
+                canvas.style.boxShadow = "0 0 50px rgba(168, 85, 247, 0.4)";
+            }
+            
+            // تأثير بصري للتحول
+            flashOverlay.classList.remove('phase-shift');
+            void flashOverlay.offsetWidth; // Trigger reflow
+            flashOverlay.classList.add('phase-shift');
+            
+            levelUpMsg.innerText = message;
+            levelUpMsg.className = `fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl md:text-6xl font-black z-40 pointer-events-none text-center whitespace-nowrap drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] level-up-anim ${msgColor}`;
+            
+            setTimeout(() => {
+                levelUpMsg.classList.remove('level-up-anim');
+                levelUpMsg.style.opacity = '0';
+            }, 2000);
+        }
+
+        function update() {
+            if (!state.gameRunning) return;
+
+            const p = state.player;
+
+            // سرعة حركة اللاعب الجانبية تزيد مع حجم الشاشة لضمان الوصول
+            const lateralSpeed = canvas.width * 0.02;
+
+            if (state.keys['ArrowLeft'] || state.keys['KeyA']) p.vx = -lateralSpeed;
+            else if (state.keys['ArrowRight'] || state.keys['KeyD']) p.vx = lateralSpeed;
+            else p.vx *= 0.85; // انزلاق تدريجي
+
+            p.vy += config.gravity;
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // التفاف الشاشة (يخرج من اليمين يظهر من اليسار)
+            if (p.x + p.width < 0) p.x = canvas.width;
+            if (p.x > canvas.width) p.x = -p.width;
+
+            // نظام الاصطدام
+            if (p.vy > 0) {
+                state.platforms.forEach(plat => {
+                    if (p.x < plat.x + plat.width && 
+                        p.x + p.width > plat.x && 
+                        p.y + p.height > plat.y && 
+                        p.y + p.height < plat.y + plat.height + p.vy) {
+                        
+                        p.vy = config.jumpForce;
+                        p.y = plat.y - p.height;
+
+                        if (!plat.visited) {
+                            plat.visited = true;
+                            state.score += 10;
+                            scoreEl.innerText = state.score;
+                            
+                            // فحص التقدم في المراحل
+                            if (state.score === PHASE_MILESTONES[2] && state.phase === 1) triggerPhase(2);
+                            if (state.score === PHASE_MILESTONES[3] && state.phase === 2) triggerPhase(3);
+                            if (state.score === PHASE_MILESTONES[4] && state.phase === 3) triggerPhase(4);
+                        }
+                    }
+                });
+            }
+
+            // تحريك الكاميرا للأعلى
+            const threshold = canvas.height / 2.2;
+            if (p.y < threshold) {
+                let diff = threshold - p.y;
+                p.y = threshold;
+                state.platforms.forEach(plat => plat.y += diff);
+            }
+
+            // حركة المنصات ونزولها التلقائي
+            state.platforms.forEach(plat => {
+                plat.y += config.gameSpeed;
+                if (plat.type === 'moving') {
+                    plat.x += plat.speed;
+                    if (plat.x < 0 || plat.x + plat.width > canvas.width) plat.speed *= -1;
+                }
+            });
+
+            // تنظيف المنصات وتوليد جديدة
+            state.platforms = state.platforms.filter(plat => plat.y < canvas.height);
+            while (state.platforms.length < config.initialPlatforms) {
+                const minY = Math.min(...state.platforms.map(pl => pl.y));
+                addPlatform(minY - 140);
+            }
+
+            if (p.y > canvas.height) {
+                endGame();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // الخلفية تتغير حسب المرحلة
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if (state.phase === 1) {
+                gradient.addColorStop(0, '#111111');
+                gradient.addColorStop(1, '#000000');
+            } else if (state.phase === 2) {
+                gradient.addColorStop(0, '#3f0000');
+                gradient.addColorStop(1, '#050000');
+            } else if (state.phase === 3) {
+                gradient.addColorStop(0, '#083344'); // لون سيان داكن
+                gradient.addColorStop(1, '#020617');
+            } else {
+                gradient.addColorStop(0, '#2e1065'); // بنفسجي مظلم
+                gradient.addColorStop(1, '#000000');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // رسم المنصات
+            state.platforms.forEach(plat => {
+                if (state.phase === 1) {
+                    // المرحلة 1: فضي كلاسيكي
+                    const platGrad = ctx.createLinearGradient(plat.x, plat.y, plat.x, plat.y + plat.height);
+                    platGrad.addColorStop(0, '#ffffff'); 
+                    platGrad.addColorStop(0.3, '#d4d4d8');
+                    platGrad.addColorStop(1, '#52525b');
+                    ctx.shadowBlur = plat.type === 'moving' ? 15 : 0;
+                    ctx.shadowColor = '#ffffff';
+                    ctx.fillStyle = platGrad;
+                    ctx.beginPath();
+                    ctx.roundRect(plat.x, plat.y, plat.width, plat.height, 8);
+                    ctx.fill();
+                } else if (state.phase === 2) {
+                    // المرحلة 2: ذهبي وحاد
+                    const platGrad = ctx.createLinearGradient(plat.x, plat.y, plat.x, plat.y + plat.height);
+                    platGrad.addColorStop(0, '#fde047');
+                    platGrad.addColorStop(0.5, '#ca8a04');
+                    platGrad.addColorStop(1, '#713f12');
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = plat.type === 'moving' ? '#ef4444' : '#ca8a04';
+                    ctx.fillStyle = platGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(plat.x + 5, plat.y);
+                    ctx.lineTo(plat.x + plat.width - 5, plat.y);
+                    ctx.lineTo(plat.x + plat.width, plat.y + plat.height);
+                    ctx.lineTo(plat.x, plat.y + plat.height);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (state.phase === 3) {
+                    // المرحلة 3: نيون سيان/زهري
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = plat.type === 'moving' ? '#ec4899' : '#06b6d4';
+                    ctx.fillStyle = plat.type === 'moving' ? '#db2777' : '#0891b2';
+                    ctx.beginPath();
+                    ctx.roundRect(plat.x, plat.y, plat.width, plat.height, 4);
+                    ctx.fill();
+                    // خط نيون داخلي
+                    ctx.fillStyle = plat.type === 'moving' ? '#fbcfe8' : '#cffafe';
+                    ctx.fillRect(plat.x + 4, plat.y + 4, plat.width - 8, 2);
+                } else {
+                    // المرحلة 4: جليتش / فراغ (أسود بحواف مضيئة مشتتة)
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = Math.random() > 0.5 ? '#a855f7' : '#ef4444';
+                    ctx.fillStyle = '#000000';
+                    ctx.strokeStyle = ctx.shadowColor;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.rect(plat.x, plat.y, plat.width, plat.height);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            });
+
+            // رسم اللاعب
+            const p = state.player;
+            ctx.shadowBlur = 25;
+            
+            let pColor1, pColor2, shadowColor;
+            if (state.phase === 1) { pColor1 = '#e0f2fe'; pColor2 = '#0ea5e9'; shadowColor = '#38bdf8'; }
+            else if (state.phase === 2) { pColor1 = '#fef3c7'; pColor2 = '#d97706'; shadowColor = '#fbbf24'; }
+            else if (state.phase === 3) { pColor1 = '#fdf4ff'; pColor2 = '#c026d3'; shadowColor = '#e879f9'; }
+            else { pColor1 = '#ffffff'; pColor2 = '#4c1d95'; shadowColor = '#ddd6fe'; }
+            
+            ctx.shadowColor = shadowColor;
+            const playerGrad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.height);
+            playerGrad.addColorStop(0, pColor1);
+            playerGrad.addColorStop(1, pColor2);
+            ctx.fillStyle = playerGrad;
+            
+            ctx.beginPath();
+            ctx.roundRect(p.x, p.y, p.width, p.height, state.phase === 4 ? 0 : 10); // اللاعب يصبح مربعاً حاداً في المرحلة 4
+            ctx.fill();
+
+            // العيون
+            ctx.fillStyle = state.phase >= 3 ? '#fff' : '#000';
+            ctx.beginPath();
+            ctx.arc(p.x + p.width*0.3, p.y + p.height*0.35, p.width*0.1, 0, Math.PI * 2);
+            ctx.arc(p.x + p.width*0.7, p.y + p.height*0.35, p.width*0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // اللمعة في المراحل الأولى والثانية فقط
+            if (state.phase < 3) {
+                ctx.fillStyle = '#fff'; 
+                ctx.beginPath();
+                ctx.arc(p.x + p.width*0.32, p.y + p.height*0.32, p.width*0.04, 0, Math.PI * 2);
+                ctx.arc(p.x + p.width*0.72, p.y + p.height*0.32, p.width*0.04, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.shadowBlur = 0;
+        }
+
+        function gameLoop() {
+            if (!state.gameRunning) return;
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            state.gameRunning = false;
+            if (state.score > state.highScore) {
+                state.highScore = state.score;
+                localStorage.setItem('learnova_jump_best_v3', state.score);
+                highScoreEl.innerText = state.score;
+            }
+            document.getElementById('final-score').innerText = state.score;
+            phaseReachedEl.innerText = `وصلت إلى: ${PHASE_NAMES[state.phase]}`;
+            gameoverScreen.classList.remove('hidden');
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+        }
+
+        // التحكم بالكيبورد
+        window.addEventListener('keydown', e => { if(state.gameRunning) state.keys[e.code] = true; });
+        window.addEventListener('keyup', e => state.keys[e.code] = false);
+
+        // تحسين التحكم باللمس ليناسب الموبايل بشكل دقيق
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault(); // منع التمرير (Scrolling) العشوائي
+            const rect = canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            
+            // تقسيم الـ canvas نفسه لنصفين للتحكم يمين/يسار بدلاً من الشاشة ككل
+            if (touchX < canvas.clientWidth / 2) {
+                state.keys['ArrowLeft'] = true;
+                state.keys['ArrowRight'] = false;
+            } else {
+                state.keys['ArrowRight'] = true;
+                state.keys['ArrowLeft'] = false;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            state.keys['ArrowLeft'] = false;
+            state.keys['ArrowRight'] = false;
+        }, { passive: false });
+
+        startBtn.onclick = initGame;
+        retryBtn.onclick = initGame;
+
+        window.addEventListener('online', () => {
+            document.getElementById('status-dot').className = 'w-2.5 h-2.5 rounded-full bg-green-500';
+            document.getElementById('status-text').innerText = 'عاد الاتصال!';
+        });
+
+        // تهيئة مبدئية قبل بدء اللعب
+        resizeCanvas();
+        state.player = {
+            x: canvas.width / 2 - config.playerSize / 2,
+            y: canvas.height - 180,
+            width: config.playerSize,
+            height: config.playerSize
+        };
+        state.platforms = [{
+            x: state.player.x - 40,
+            y: state.player.y + 60,
+            width: 160,
+            height: config.platformHeight,
+            type: 'static'
+        }];
+        draw(); 
+    </script>
 </body>
 </html>
