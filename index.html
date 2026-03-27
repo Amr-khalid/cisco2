@@ -2,39 +2,177 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اختبار مراجعة Ethical Hacking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; line-height: 1.6; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2c3e50; }
-        .controls { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; background: #3498db; color: white; font-weight: bold; }
-        button:hover { background: #2980b9; }
-        .question-card { border-bottom: 2px solid #eee; padding: 15px 0; margin-bottom: 10px; }
-        .options { margin-top: 10px; }
-        .option { display: block; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; text-align: right; }
-        .option:hover { background: #f9f9f9; }
-        .correct { background: #d4edda !important; border-color: #c3e6cb !important; color: #155724; font-weight: bold; }
-        .wrong { background: #f8d7da !important; border-color: #f5c6cb !important; color: #721c24; }
-        .hidden { display: none; }
-        .info { text-align: center; font-weight: bold; margin-bottom: 10px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: #e5e7eb;
+            transform: translateX(-5px);
+        }
+        .correct-ans {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534 !important;
+            font-weight: bold;
+        }
+        .wrong-ans {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        .disabled-opts {
+            pointer-events: none;
+            opacity: 0.9;
+        }
     </style>
 </head>
-<body>
+<body class="text-gray-800 p-4 md:p-8">
 
-<div class="container">
-    <h1>اختبار مراجعة Ethical Hacking (25-26)</h1>
-    
-    <div class="controls">
-        <button onclick="shuffleQuestions()">خلط الأسئلة (عشوائي)</button>
-        <span id="page-info"></span>
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-800 text-white p-6 text-center">
+            <h1 class="text-3xl font-bold mb-2">اختبار المراجعة: Ethical Hacking</h1>
+            <p class="text-blue-200">تدرب على جميع أسئلة المنهج بالترتيب أو بشكل عشوائي</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 border-b">
+            <button onclick="shuffleQuestions()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg shadow mb-4 md:mb-0 transition">
+                <span class="mr-2">🔀</span> خلط الأسئلة (عشوائي)
+            </button>
+            <div id="progress-info" class="text-lg font-semibold text-gray-700 bg-white px-4 py-2 rounded shadow-sm border">
+                -- / --
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="p-6 space-y-8">
+            <!-- Questions will be injected here via JS -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="bg-gray-50 p-6 border-t flex justify-between items-center">
+            <button id="prev-btn" onclick="prevPage()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg shadow disabled:opacity-50 disabled:cursor-not-allowed transition">
+                الصفحة السابقة
+            </button>
+            <button id="next-btn" onclick="nextPage()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow disabled:opacity-50 disabled:cursor-not-allowed transition">
+                التالي (20 سؤال)
+            </button>
+        </div>
     </div>
 
-    <div id="quiz-container"></div>
-
-    <div class="controls" style="margin-top:20px;">
-        <button id="prev-btn" onclick="prevPage()">السابق</button>
-        <button id="next-btn" onclick="nextPage()">التالي (20 سؤال)</button>
+    <script>
+        // Data Structure: q = Question, opts = Options array, ans = Index of correct option
+        const originalQuestions = [
+            // --- Part 1: CIA Triad & Basics ---
+            { q: "Confidentiality ensures that information is:", opts: ["Always accessible to all employees", "Accessible only to authorized users", "Protected from accidental deletion", "Stored in multiple locations"], ans: 1 },
+            { q: "Maintains the trustworthiness of data or resources, preventing unauthorized or improper changes.", opts: ["Integrity", "Availability", "Non-Repudiation", "Authenticity"], ans: 0 },
+            { q: "Assures that systems for delivering, storing, and processing information are accessible when required by authorized users.", opts: ["Integrity", "Availability", "Non-Repudiation", "Authenticity"], ans: 1 },
+            { q: "Refers to the genuineness of a communication, document, or data.", opts: ["Integrity", "Availability", "Non-Repudiation", "Authenticity"], ans: 3 },
+            { q: "Guarantees that a sender cannot deny sending a message and the recipient cannot deny having received it.", opts: ["Integrity", "Availability", "Non-Repudiation", "Authenticity"], ans: 2 },
+            { q: "Which element prevents a sender from denying they sent a message?", opts: ["Integrity", "Availability", "Non-Repudiation", "Authenticity"], ans: 2 },
+            { q: "Integrity is compromised if:", opts: ["A system crashes due to high traffic", "Data is altered by an unauthorized user", "A user forgets their password", "A backup fails"], ans: 1 },
+            { q: "Availability is MOST critical for:", opts: ["Archival records", "Real-time stock trading systems", "Encrypted emails", "Printed documents"], ans: 1 },
+            { q: "Authenticity verifies:", opts: ["The speed of data transmission", "The genuineness of a communication", "The storage capacity of a server", "The cost of security measures"], ans: 1 },
+            { q: "The formula Attack = Motive + Method + Vulnerability implies:", opts: ["Attacks are always financial", "Vulnerabilities alone cannot cause an attack without motive", "Methods are irrelevant to attackers", "Motives are never political"], ans: 1 },
+            { q: "Which motive is LEAST likely for a cyberattack?", opts: ["Disrupting critical infrastructure", "Improving network bandwidth", "Stealing sensitive data", "Causing financial losses"], ans: 1 },
+            { q: "A vulnerability is best defined as:", opts: ["A type of malware", "A weakness exploitable by attackers", "An attacker's primary goal", "A security protocol"], ans: 1 },
+            { q: "Attackers use methods to:", opts: ["Exploit vulnerabilities", "Eliminate their motives", "Repair system flaws", "Volunteer as security consultants"], ans: 0 },
+            { q: "Which is a primary motive for state-sponsored attacks?", opts: ["Achieving military objectives", "Selling antivirus software", "Improving public healthcare", "Promoting free education"], ans: 0 },
+            
+            // --- Attacks Types ---
+            { q: "Passive attacks typically involve:", opts: ["Eavesdropping without altering data", "Deleting system files", "Sending phishing emails", "Overloading a server"], ans: 0 },
+            { q: "Which is an active attack?", opts: ["Sniffing network traffic", "Session hijacking", "Shoulder surfing", "Reading encrypted emails"], ans: 1 },
+            { q: "Close-in attacks require:", opts: ["Physical proximity to the target", "Remote server access", "Exploiting zero-day vulnerabilities", "Social media accounts"], ans: 0 },
+            { q: "Shoulder surfing is an example of:", opts: ["Passive attack", "Close-in attack", "Insider attack", "Distribution attack"], ans: 1 },
+            { q: "Which attack intercepts and modifies data in transit?", opts: ["Sniffing", "Man-in-the-Middle (MitM)", "Dumpster diving", "Social engineering"], ans: 1 },
+            { q: "Insider attacks are uniquely dangerous because:", opts: ["Attackers already have privileged access", "They require physical proximity", "They only target hardware", "They are always accidental"], ans: 0 },
+            { q: "A distribution attack could involve:", opts: ["Tampering with software before installation", "Sending spam emails", "Brute-forcing passwords", "Encrypting backups"], ans: 0 },
+            { q: "Which is an example of an insider attack?", opts: ["Phishing", "Installing a backdoor in the company's server", "Denial-of-Service attack", "Eavesdropping on public Wi-Fi"], ans: 1 },
+            { q: "Hardware tampering is a hallmark of:", opts: ["Passive attacks", "Distribution attacks", "Social engineering", "Phishing"], ans: 1 },
+            { q: "An employee stealing a company laptop is an:", opts: ["Active attack", "Insider attack", "Close-in attack", "Offensive warfare"], ans: 1 },
+            
+            // --- Warfare & Phases ---
+            { q: "Defensive information warfare aims to:", opts: ["Protect ICT assets from attacks", "Hack enemy databases", "Spread disinformation", "Develop new malware"], ans: 0 },
+            { q: "Which is a key component of defensive warfare?", opts: ["Exploiting vulnerabilities", "Deterrence", "Data theft", "Propaganda"], ans: 1 },
+            { q: "Offensive information warfare includes:", opts: ["Web server attacks", "Installing firewalls", "Training employees", "Encrypting files"], ans: 0 },
+            { q: "A country disrupting an enemy's power grid is an example of:", opts: ["Defensive warfare", "Offensive warfare", "Passive attack", "Insider attack"], ans: 1 },
+            { q: "Prevention in defensive warfare refers to:", opts: ["Stopping attacks before they occur", "Concealing attack evidence", "Rewarding hackers", "Deleting logs"], ans: 0 },
+            { q: "The FIRST step in hacking is:", opts: ["Scanning", "Footprinting", "Password cracking", "Covering tracks"], ans: 1 },
+            { q: "Enumeration involves:", opts: ["Extracting user accounts and shared resources", "Deleting system logs", "Sending phishing emails", "Overloading a server"], ans: 0 },
+            { q: "Vulnerability analysis identifies:", opts: ["Exploitable weaknesses", "Network uptime statistics", "Employee salaries", "Backup schedules"], ans: 0 },
+            { q: "Escalating privileges allows attackers to:", opts: ["Gain higher-level access", "Encrypt all files", "Disable the internet", "Register new domains"], ans: 0 },
+            { q: "Clearing logs is done to:", opts: ["Erase evidence of intrusion", "Improve system speed", "Create backups", "Update software"], ans: 0 },
+            
+            // --- Cyber Kill Chain ---
+            { q: "The first phase of the Cyber Kill Chain is:", opts: ["Weaponization", "Reconnaissance", "Delivery", "Exploitation"], ans: 1 },
+            { q: "Weaponization involves:", opts: ["Sending phishing emails", "Creating a malicious payload with an exploit", "Installing malware", "Deleting logs"], ans: 1 },
+            { q: "Which phase establishes communication with the compromised system?", opts: ["Installation", "Command and Control (C2)", "Actions on Objectives", "Exploitation"], ans: 1 },
+            { q: "Delivery in the Cyber Kill Chain refers to:", opts: ["Transmitting the weaponized payload (e.g., via email/USB)", "Exploiting a zero-day vulnerability", "Escalating privileges", "Covering tracks"], ans: 0 },
+            { q: "The final phase of the Cyber Kill Chain is:", opts: ["Installation", "Actions on Objectives", "Reconnaissance", "Exploitation"], ans: 1 },
+            { q: "Exploitation occurs when:", opts: ["Malware is installed", "Malicious code executes to compromise the system", "A C2 channel is established", "Data is exfiltrated"], ans: 1 },
+            { q: "Which phase directly follows 'Weaponization'?", opts: ["Reconnaissance", "Delivery", "Installation", "Actions on Objectives"], ans: 1 },
+            { q: "Installation ensures:", opts: ["Malware persists on the target system", "Vulnerabilities are patched", "Attackers erase evidence", "Data is encrypted"], ans: 0 },
+            { q: "Tactics in TTPs describe:", opts: ["The overall approach to executing an attack", "Specific malware signatures", "Firewall configurations", "Encryption algorithms"], ans: 0 },
+            { q: "Which is a tactic used by attackers?", opts: ["Lateral movement", "Using Metasploit", "Sending spam emails", "Creating backups"], ans: 0 },
+            { q: "Initial exploitation falls under:", opts: ["Procedures", "Tactics", "Techniques", "Objectives"], ans: 1 },
+            { q: "Techniques refer to:", opts: ["Technical methods to achieve attack goals", "Organizational hierarchies", "Legal compliance steps", "Risk assessment frameworks"], ans: 0 },
+            { q: "Which is an example of a technique?", opts: ["Data exfiltration", "Defining attack motives", "Writing company policies", "Conducting employee training"], ans: 0 },
+            { q: "Procedures are:", opts: ["Structured steps attackers follow", "Hardware specifications", "Incident response plans", "Encryption standards"], ans: 0 },
+            
+            // --- Hacking Concepts & Types ---
+            { q: "Hacking primarily involves:", opts: ["Exploiting vulnerabilities for unauthorized access", "Improving system performance", "Creating legal software", "Conducting audits"], ans: 0 },
+            { q: "Theft and redistribution in hacking can lead to:", opts: ["Financial/business losses", "Enhanced cybersecurity", "Faster networks", "Improved user experience"], ans: 0 },
+            { q: "Modifying system features beyond their intent is:", opts: ["A goal of hacking", "A compliance requirement", "A firewall function", "A backup strategy"], ans: 0 },
+            { q: "A major risk of hacking is:", opts: ["Reputation damage", "Increased server uptime", "Reduced data storage", "Improved employee morale"], ans: 0 },
+            { q: "Unauthorized access often results in:", opts: ["Sensitive data breaches", "Faster software updates", "Legal rewards", "Automated backups"], ans: 0 },
+            { q: "Altering software functionalities can cause:", opts: ["Operational disruption", "Enhanced encryption", "Compliance certification", "Reduced attack surfaces"], ans: 0 },
+            { q: "Hackers typically possess:", opts: ["Advanced computer skills", "Legal expertise", "Marketing knowledge", "Medical training"], ans: 0 },
+            { q: "For some hackers, hacking is:", opts: ["A hobby to test skills", "A corporate job requirement", "A form of physical exercise", "A financial auditing tool"], ans: 0 },
+            { q: "A hacker might explore:", opts: ["How many networks they can compromise", "Employee satisfaction surveys", "Office furniture design", "Lunch menu options"], ans: 0 },
+            { q: "Which is NOT a common hacker motivation?", opts: ["Gaining system knowledge", "Probing for weaknesses", "Improving user experience", "Stealing sensitive data"], ans: 2 },
+            { q: "Hackers with malicious intent primarily aim to:", opts: ["Compromise credit card/Social Security data", "Enhance network bandwidth", "Develop legal software", "Train employees"], ans: 0 },
+            { q: "Black Hat hackers are characterized by:", opts: ["Engaging in destructive activities", "Defending systems legally", "Reporting vulnerabilities", "Creating firewalls"], ans: 0 },
+            { q: "White Hat hackers differ from Black Hats because they:", opts: ["Work with system owners' permission", "Exploit zero-day vulnerabilities", "Erase attack logs", "Sell stolen data"], ans: 0 },
+            { q: "Gray Hat hackers are unique because they:", opts: ["Operate both offensively and defensively", "Only follow strict ethical guidelines", "Work exclusively for governments", "Avoid all illegal activities"], ans: 0 },
+            { q: "Suicide hackers are motivated by:", opts: ["Financial profit", "Ideological disruption", "Career advancement", "Legal recognition"], ans: 1 },
+            { q: "Script Kiddies rely on:", opts: ["Pre-written hacking tools", "Advanced coding skills", "Government funding", "Physical infiltration"], ans: 0 },
+            { q: "Cyber terrorists primarily seek to:", opts: ["Cause fear through large-scale disruptions", "Improve cybersecurity", "Develop open-source software", "Conduct employee training"], ans: 0 },
+            { q: "State-sponsored hackers typically target:", opts: ["Other nations' classified systems", "Small businesses for ransom", "Social media influencers", "Public libraries"], ans: 0 },
+            { q: "Hacktivists differ from cyber terrorists because they:", opts: ["Focus on political messaging (e.g., website defacement)", "Engage only in financial crimes", "Work for corporate competitors", "Avoid all illegal activities"], ans: 0 },
+            { q: "Hacker teams are distinct due to their:", opts: ["Collaborative development of advanced tools", "Reliance on amateur scripts", "Exclusive focus on ethical hacking", "Avoidance of technology research"], ans: 0 },
+            { q: "Industrial spies aim to:", opts: ["Steal trade secrets from competitors", "Improve workplace safety", "Advocate for privacy laws", "Develop antivirus software"], ans: 0 },
+            { q: "Insider threats are dangerous because they:", opts: ["Already have privileged access", "Lack technical skills", "Only target external systems", "Work alone without resources"], ans: 0 },
+            { q: "Criminal syndicates primarily engage in:", opts: ["Sophisticated financial cybercrimes", "Ethical penetration testing", "Public cybersecurity education", "Hardware manufacturing"], ans: 0 },
+            { q: "Organized hackers often use:", opts: ["Botnets for large-scale attacks", "Company-approved software", "Legal hacking certifications", "Open-source intelligence only"], ans: 0 },
+            
+            // --- Footprinting ---
+            { q: "Footprinting is primarily used to:", opts: ["Encrypt target data", "Identify system vulnerabilities", "Delete network logs", "Improve user experience"], ans: 1 },
+            { q: "Passive footprinting involves:", opts: ["Sending phishing emails", "Collecting public records without direct contact", "Exploiting zero-day vulnerabilities", "Brute-forcing passwords"], ans: 1 },
+            { q: "Which activity is active footprinting?", opts: ["Reading Wikipedia pages", "Sending DNS queries to the target", "Viewing LinkedIn profiles", "Analyzing old news articles"], ans: 1 },
+            { q: "Which is NOT typically gathered during footprinting?", opts: ["Employee phone numbers", "Network topology", "Encrypted passwords", "Domain names"], ans: 2 },
+            { q: "System information collected might include:", opts: ["Web server OS details", "CEO's personal hobbies", "Company stock price", "Office cafeteria menu"], ans: 0 },
+            { q: "Footprinting can reveal:", opts: ["Publicly exposed email addresses", "Future product launch dates", "Employee salaries", "Legal case settlements"], ans: 0 },
+            { q: "Search engines in footprinting help attackers find:", opts: ["Sensitive data leaks (e.g., login pages)", "Physical office layouts", "Employee performance reviews", "Corporate tax filings"], ans: 0 },
+            { q: "Social networking analysis focuses on:", opts: ["Extracting employee/org details from profiles", "Hacking social media accounts", "Generating fake profiles", "Tracking user locations in real-time"], ans: 0 },
+            { q: "Web services provide metadata such as:", opts: ["API endpoints and server configurations", "Employee vacation schedules", "Board meeting minutes", "Financial audit reports"], ans: 0 },
+            { q: "Whois footprinting reveals:", opts: ["Domain ownership details", "Employee home addresses", "Encrypted SSL certificates", "Firewall configurations"], ans: 0 },
+            { q: "DNS footprinting is used to map:", opts: ["Subdomains and IP ranges", "Employee social connections", "Office Wi-Fi passwords", "Cloud storage costs"], ans: 0 },
+            { q: "Email headers analyzed during email footprinting can expose:", opts: ["Sender IP addresses and routing paths", "Email content encryption keys", "Recipient's biometric data", "Attached file hashes"], ans: 0 },
+            { q: "Network footprinting tools include:", opts: ["Traceroute", "Password crackers", "Keystroke loggers", "Screen capture software"], ans: 0 },
+            { q: "Social engineering in footprinting might involve:", opts: ["Dumpster diving for discarded documents", "SQL injection attacks", "DDOS attacks", "Encrypting backups"], ans: 0 },
+            { q: "The goal of footprinting is to:", opts: ["Create a vulnerability profile of the target", "Deploy ransomware", "Patch system flaws", "Monitor employee productivity"], ans: 0 },
+            { q: "Attackers use search engines to find:", opts: ["Intranet portals and login pages", "CEO's medical records", "Encrypted VPN credentials", "Two-factor authentication codes"], ans: 0 },
+            { q: "Advanced search operators help:", opts: ["Refine queries for precise data leaks", "Bypass CAPTCHAS", "Crack pa        <button id="next-btn" onclick="nextPage()">التالي (20 سؤال)</button>
     </div>
 </div>
 
