@@ -172,4 +172,257 @@
             { q: "Social engineering in footprinting might involve:", opts: ["Dumpster diving for discarded documents", "SQL injection attacks", "DDOS attacks", "Encrypting backups"], ans: 0 },
             { q: "The goal of footprinting is to:", opts: ["Create a vulnerability profile of the target", "Deploy ransomware", "Patch system flaws", "Monitor employee productivity"], ans: 0 },
             { q: "Attackers use search engines to find:", opts: ["Intranet portals and login pages", "CEO's medical records", "Encrypted VPN credentials", "Two-factor authentication codes"], ans: 0 },
-            { q: "Advanced search operators help:", opts: ["Refine queries for precise data leaks", "Bypass CAPTCHAS", "Crack pa
+            { q: "Advanced search operators help:", opts: ["Refine queries for precise data leaks", "Bypass CAPTCHAS", "Crack password hashes", "Spoof IP addresses"], ans: 0 },
+            { q: "Which is a passive footprinting technique?", opts: ["Google dorking for exposed documents", "Port scanning", "Phishing campaigns", "SQL injection"], ans: 0 },
+            { q: "Baidu and DuckDuckGo are examples of:", opts: ["Search engines used in reconnaissance", "Vulnerability scanners", "Firewall vendors", "Encryption standards"], ans: 0 },
+            { q: "Publicly accessible job postings might reveal:", opts: ["Technologies used by the organization", "Employee bank account details", "SSL private keys", "Data center physical security codes"], ans: 0 },
+            
+            // --- Google Hacking / Dorks ---
+            { q: "Google hacking primarily involves:", opts: ["Creating Google Ads campaigns", "Using advanced search operators to find hidden data", "Developing new Google algorithms", "Reporting vulnerabilities to Google"], ans: 1 },
+            { q: "The main goal of Google hacking is to:", opts: ["Improve search engine rankings", "Locate vulnerable targets or sensitive information", "Encrypt public web pages", "Block malicious websites"], ans: 1 },
+            { q: "The [cache:] operator displays:", opts: ["Google's stored version of a webpage", "Real-time server logs", "Website owner's contact details", "SSL certificate information"], ans: 0 },
+            { q: "To find pages linking to a specific URL, use:", opts: ["[info:]", "[related:]", "[link:]", "[site:]"], ans: 2 },
+            { q: "The [site:] operator restricts results to:", opts: ["A specified domain", "Government websites only", "Pages with broken links", "Social media platforms"], ans: 0 },
+            { q: "[allintitle:] limits results to pages where:", opts: ["Keywords appear in the URL", "All keywords are in the title", "Location matches the query", "Metadata contains specific tags"], ans: 1 },
+            { q: "To find documents with 'admin' in the URL, use:", opts: ["[intitle:]", "[inurl:]", "[location:]", "[info:]"], ans: 1 },
+            { q: "The [location:] operator helps:", opts: ["Filter results by geographic region", "Identify server IP addresses", "Bypass paywalls", "Find encrypted files"], ans: 0 },
+            { q: "The GHDB is used to:", opts: ["Find vulnerabilities via curated Google dorks", "Report bugs to Google", "Index academic papers", "Block malicious searches"], ans: 0 },
+            { q: "GHDB queries can expose:", opts: ["Error messages and sensitive files", "Employee salaries", "Two-factor authentication codes", "Firewall configurations"], ans: 0 },
+            { q: "A Google dork is a:", opts: ["Custom search query with advanced operators", "Type of malware", "Google employee", "Captcha-solving tool"], ans: 0 },
+            { q: "Google dorks are commonly used to discover:", opts: ["Exposed credentials and security flaws", "Copyrighted music", "Cloud storage pricing", "VPN configurations"], ans: 0 },
+            { q: "The query site:testphp.vulnweb.com inurl:login aims to find:", opts: ["Login pages on a specific domain", "Broken links", "PDF documents", "Social media profiles"], ans: 0 },
+            { q: "filetype:pdf combined with site: searches for:", opts: ["PDF files on the target site", "Password-protected pages", "Database backups", "JavaScript files"], ans: 0 },
+            { q: "The query intitle:'Index of /' reveals:", opts: ["Open directories with listing enabled", "Encrypted folders", "Website analytics", "DNS records"], ans: 0 },
+            
+            // --- Network Scanning & TCP/UDP ---
+            { q: "Network scanning is primarily used to:", opts: ["Encrypt network traffic", "Identify active devices and open ports", "Block unauthorized users", "Improve Wi-Fi signal strength"], ans: 1 },
+            { q: "Which is NOT an objective of network scanning?", opts: ["Discovering live hosts", "Modifying firewall rules", "Identifying vulnerable services", "Mapping IP addresses"], ans: 1 },
+            { q: "Scanning helps ethical hackers by:", opts: ["Creating a target profile for security audits", "Deleting system logs", "Generating fake traffic", "Disabling antivirus software"], ans: 0 },
+            { q: "The TCP protocol ensures:", opts: ["Reliable data delivery", "Anonymity of users", "Automatic malware detection", "Data encryption by default"], ans: 0 },
+            { q: "The SYN flag is used to:", opts: ["Initiate a connection (handshake)", "Terminate a session", "Mark data as urgent", "Reset a corrupted connection"], ans: 0 },
+            { q: "Which flag confirms packet receipt?", opts: ["URG", "ACK", "PSH", "RST"], ans: 1 },
+            { q: "The PSH flag instructs the system to:", opts: ["Send buffered data immediately", "Prioritize voice traffic", "Encrypt the next packet", "Drop duplicate packets"], ans: 0 },
+            { q: "A RST flag is sent when:", opts: ["A connection needs abrupt termination", "Data transfer is complete", "A SYN handshake succeeds", "Network congestion occurs"], ans: 0 },
+            { q: "The URG flag indicates:", opts: ["Data requires immediate processing", "A port is closed", "Checksum validation failed", "A DNS lookup is pending"], ans: 0 },
+            { q: "The correct sequence of a TCP three-way handshake is:", opts: ["SYN → FIN → ACK", "SYN → SYN-ACK → ACK", "ACK → SYN → RST", "PSH → URG → FIN"], ans: 1 },
+            { q: "During the handshake, the SYN-ACK packet is sent by:", opts: ["The server", "The client", "A router", "A firewall"], ans: 0 },
+            { q: "The handshake establishes:", opts: ["A bidirectional communication channel", "VPN tunneling", "Data encryption keys", "MAC address filtering"], ans: 0 },
+            { q: "Graceful TCP termination involves:", opts: ["FIN and ACK exchanges", "Sending RST packets", "Blocking all ports", "Disabling the NIC"], ans: 0 },
+            { q: "In termination, the final ACK confirms:", opts: ["Receipt of the FIN packet", "Data integrity checks", "Session re-establishment", "Firewall deactivation"], ans: 0 },
+            { q: "An abrupt termination would use:", opts: ["RST flag", "SYN flag", "PSH flag", "URG flag"], ans: 0 },
+            
+            // --- Scans & Subnets ---
+            { q: "A /24 subnet mask is equivalent to:", opts: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.255"], ans: 2 },
+            { q: "A subnet with /16 can support approximately:", opts: ["254 hosts", "65,000 hosts", "16 million hosts", "128 hosts"], ans: 1 },
+            { q: "Network segmentation primarily:", opts: ["Improves security and performance", "Increases IP address waste", "Elimates the need for routers", "Disables all firewall rules"], ans: 0 },
+            { q: "ARP is used to:", opts: ["Encrypt data packets", "Map IP addresses to MAC addresses", "Establish VPN tunnels", "Block ICMP traffic"], ans: 1 },
+            { q: "An ICMP Echo Reply has a type value of:", opts: ["8", "0", "3", "11"], ans: 1 },
+            { q: "To ping a host on the same subnet, ARP is used before ICMP because:", opts: ["It resolves the MAC address first", "ICMP is always blocked", "ARP encrypts the request", "It bypasses firewalls"], ans: 0 },
+            { q: "The Transport Layer in TCP/IP includes:", opts: ["TCP and UDP", "IPv4 and IPv6", "Ethernet and WiFi", "HTTP and FTP"], ans: 0 },
+            { q: "Which technique is LAN-specific for host discovery?", opts: ["ICMP Ping", "ARP Ping Scan", "TCP SYN Ping", "UDP Ping Sweep"], ans: 1 },
+            { q: "A UDP Ping Scan detects live hosts when they respond with:", opts: ["A UDP acknowledgment", "ICMP 'port unreachable'", "A SYN-ACK packet", "An ARP broadcast"], ans: 1 },
+            { q: "ICMP Timestamp Ping requests:", opts: ["System clock information", "Open port lists", "MAC address tables", "Firewall configurations"], ans: 0 },
+            { q: "An ICMP Address Mask Ping queries:", opts: ["Subnet mask details", "Default gateway IP", "DNS server addresses", "VLAN tags"], ans: 0 },
+            { q: "ICMP Echo Ping Sweep is used to:", opts: ["Discover multiple live hosts in a range", "Test single-host bandwidth", "Encrypt network traffic", "Bypass intrusion detection systems"], ans: 0 },
+            { q: "Which ICMP type is NOT used for host discovery?", opts: ["Echo (Type 8)", "Destination Unreachable (Type 3)", "Timestamp (Type 13)", "Address Mask (Type 17)"], ans: 1 },
+            
+            // --- Advanced Scanning & Nmap ---
+            { q: "A TCP SYN Ping works by:", opts: ["Sending RST packets", "Sending SYN packets to detect active hosts", "Broadcasting ARP requests", "Encrypting ICMP traffic"], ans: 1 },
+            { q: "TCP ACK Ping is useful to:", opts: ["Bypass stateless firewalls", "Terminate established sessions", "Measure network bandwidth", "Test DNS resolution"], ans: 0 },
+            { q: "An IP Protocol Ping Scan probes:", opts: ["Only UDP ports", "Multiple IP protocols (TCP/UDP/ICMP)", "Exclusive HTTP traffic", "VLAN configurations"], ans: 1 },
+            { q: "The command nmap -p 1-65535 -T4 -A -v 10.10.1.11 performs:", opts: ["A stealth IDLE scan", "Aggressive scanning with OS/version detection", "Ping sweep only", "DNS enumeration"], ans: 1 },
+            { q: "Nmap's primary purpose is NOT:", opts: ["Identifying open ports", "Generating phishing emails", "Detecting OS versions", "Monitoring host uptime"], ans: 1 },
+            { q: "The command hping3 -1 10.0.0.25 sends:", opts: ["ICMP echo requests", "TCP SYN packets", "UDP broadcasts", "ARP probes"], ans: 0 },
+            { q: "An ACK scan on port 80 (hping3 -A 10.0.0.25 -p 80) determines if the port is:", opts: ["Filtered by a firewall", "Running HTTP services", "Part of a VLAN", "Using IPv6"], ans: 0 },
+            { q: "Metasploit is primarily used for:", opts: ["Network bandwidth monitoring", "Penetration testing and vulnerability exploitation", "DNS server configuration", "Data encryption"], ans: 1 },
+            { q: "The command nmap -sn TARGETS performs:", opts: ["Host discovery without port scanning", "Full vulnerability assessment", "OS fingerprinting only", "Firewall rule extraction"], ans: 0 },
+            { q: "ARP is preferred for local scans because it:", opts: ["Bypasses IP-based firewalls", "Encrypts host responses", "Works across VLANs", "Requires no privileges"], ans: 0 },
+            
+            // --- Specific Scans Types ---
+            { q: "In a TCP Connect Scan, an open port responds with:", opts: ["RST", "SYN/ACK", "ICMP Unreachable", "No response"], ans: 1 },
+            { q: "The command nmap -sT MACHINE_IP performs a:", opts: ["Full TCP 3-way handshake", "SYN stealth scan", "Xmas scan", "UDP port sweep"], ans: 0 },
+            { q: "A SYN scan (-sS) is stealthier because it:", opts: ["Avoids completing the handshake", "Encrypts all traffic", "Uses ICMP timestamps", "Spoofs MAC addresses"], ans: 0 },
+            { q: "In a SYN scan, a closed port responds with:", opts: ["SYN/ACK", "RST", "FIN/ACK", "PSH"], ans: 1 },
+            { q: "An Xmas scan (-sX) sets which TCP flags?", opts: ["FIN, PSH, URG", "SYN, ACK, RST", "Only URG", "SYN, FIN, ACK"], ans: 0 },
+            { q: "If a port is closed during an Xmas scan, the target responds with:", opts: ["SYN/ACK", "RST", "ICMP Echo", "No response"], ans: 1 },
+            { q: "A FIN scan (-sF) is effective against:", opts: ["Stateful firewalls", "Non-stateful firewalls", "Web application firewalls", "DNS servers"], ans: 1 },
+            { q: "A NULL scan sends packets with:", opts: ["SYN+ACK flags", "All flags unset (zero)", "FIN+URG flags", "Only PSH flag"], ans: 1 },
+            { q: "A UDP scan identifies closed ports when they respond with:", opts: ["SYN/ACK", "ICMP Port Unreachable (Type 3, Code 3)", "TCP RST", "ARP Reply"], ans: 1 },
+
+            // --- Linux Commands & T/F ---
+            { q: "rmdir command can be used to remove a directory with empty contents", opts: ["True", "False"], ans: 0 },
+            { q: "rmdir command can be used to remove a directory without empty contents", opts: ["True", "False"], ans: 1 },
+            { q: "To rename a file we can use the command", opts: ["mv", "rename", "cp", "None of them"], ans: 0 },
+            { q: "command can be used for creating files with contents and without contents, and concatenating new content with a file", opts: ["touch", "None of them", "both of them", "cat"], ans: 3 },
+            { q: "command is used for creating a file to change details such as date, but hasn't ability to add content to the file.", opts: ["Both of them", "None of them", "cat", "touch"], ans: 3 },
+            { q: "The root directory is represented by", opts: ["\\", "/", "*", "$"], ans: 1 },
+            { q: "Which command is used for printing the current working directory?", opts: ["HOME", "cd", "pwd", "dir"], ans: 2 },
+            { q: "pwd command is used for checking our current directory. Current directory is the directory in which we are currently working.", opts: ["True", "False"], ans: 0 },
+            { q: "Which command is used for changing the current directory?", opts: ["cd", "cp", "pwd", "rm"], ans: 0 },
+            { q: "Which command is used for creating directories?", opts: ["rmdir", "mkdir", "cd", "cp"], ans: 1 },
+            { q: "Which command is used for removing an empty directory?", opts: ["mkdir", "rmdir", "del", "remove"], ans: 1 },
+            { q: "For moving two level up in the file hierarchy system using cd command once, we separates (..) by which symbol?", opts: ["?", "$", "*", "/"], ans: 3 },
+            { q: "Which command is used for listing files in a directory?", opts: ["ps", "list", "ls", "wc"], ans: 2 },
+            { q: "Which option is used with ls command for long listing of files with seven attributes?", opts: ["-a", "-l", "-x", "-i"], ans: 1 },
+            { q: "Which command is used for displaying contents of a file?", opts: ["cp", "rm", "cat", "mkdir"], ans: 2 },
+            { q: "Apart from displaying file contents, cat command is also used for", opts: ["displaying", "deleting", "copying", "creating"], ans: 3 },
+            { q: "Which symbol is used with cat command for creating files?", opts: [">", "<", "*", "/"], ans: 0 },
+            { q: "If we create a file using cat command with the same filename which already exists in the current directory then,", opts: ["existing file is deleted", "new file will be created separately", "existing file will be overwritten", "an error will be produced"], ans: 2 },
+            { q: "Which symbol is used to append an existing file?", opts: [">", "<", ">>", "$"], ans: 2 },
+            { q: "Which of the following cannot be performed by cat command?", opts: ["displaying files", "creating files", "appending files", "deleting files"], ans: 3 },
+            { q: "Which command is used to create empty files?", opts: ["cp", "cat", "touch", "create"], ans: 2 },
+            { q: "What is the function of cp command?", opts: ["list all files", "delete a given file", "copying files and directories", "change the directory"], ans: 2 },
+            { q: "Which command is used for removing/deleting files?", opts: ["rmdir", "rm", "del", "mv"], ans: 1 },
+            { q: "Which one of the following commands can delete a directory which is not empty?", opts: ["rm -r", "rmdir", "$rm*", "del *"], ans: 0 },
+            { q: "The mv command can be used to move a file or directory to a new location or simply to give an existing file a new name.", opts: ["True", "False"], ans: 0 },
+            { q: "What command shows you what directory you are in?", opts: ["Ppx", "Px", "Wpd", "pwd"], ans: 3 },
+            { q: "How do you rename file 'new' to file 'old'?", opts: ["mv new old", "move new old", "cp new old", "rn new old"], ans: 0 },
+            { q: "Which option of rm command is used to remove a directory with all its subdirectories", opts: ["-b", "-o", "-p", "-r"], ans: 3 },
+            { q: "In Linux, the one 'all-powerful' superuser or system administrator is named root,", opts: ["True", "False"], ans: 0 },
+            { q: "you can use the .....command to see which user you're logged in as:", opts: ["Pwd", "whoami", "cd", "ls"], ans: 1 },
+            { q: "To move up one level in the file structure, we use cd followed by double dots (..)", opts: ["True", "False"], ans: 0 },
+            { q: "Which command is used to to move up two levels?", opts: ["cd ../..", "cd ../../..", "cd..", "cd /"], ans: 0 },
+            { q: "To see the contents of a directory (the files and subdirectories), we can use the ls (list) command", opts: ["True", "False"], ans: 0 },
+            { q: "ls command lists the files only contained in the directory", opts: ["True", "False"], ans: 1 },
+            { q: "To show hidden files, add a lowercase............ to command ls", opts: ["-l", "-a", "-c", "-h"], ans: 1 },
+            { q: "to create a file, we use the ....... command, and a name for the file we want to create.", opts: ["cat >", "cat >>", "cat", "touch"], ans: 0 },
+            { q: "To add, or append, more content to a file, you can use the command", opts: ["cat >", "cat >>", "cat", "touch"], ans: 1 },
+            { q: "If I want to overwrite the file with new information, I can simply use the cat command with single redirect again (cat >)", opts: ["True", "False"], ans: 0 },
+            { q: "The command for creating a directory in Linux is mkdir", opts: ["True", "False"], ans: 0 },
+            { q: "The command for creating a file in Linux is mkdir", opts: ["True", "False"], ans: 1 },
+            { q: "rmdir will remove a directory that is not empty", opts: ["True", "False"], ans: 1 },
+            { q: "The directory contains the Linux configuration files, that control when and how programs start up is..........", opts: ["/lib", "/bin", "/etc", "/sys"], ans: 2 },
+            { q: "To find binaries (executable files), we use the command", opts: ["locate", "whereis", "find", "none of them"], ans: 1 },
+            { q: "Which command changes the working directory to the parent of the current location?", opts: ["cd", "cd ..", "cd ../..", "cd -ul"], ans: 1 },
+            { q: "Which command lists files in the current location, with a long format, and including hidden files?", opts: ["llong", "ls -a", "ls -l", "ls -al"], ans: 3 },
+            
+            // --- Converted Essay Questions (Engineered as Multiple Choice) ---
+            { q: "How do you list all hidden files in a directory?", opts: ["ls -la", "ls -l", "list -all", "dir /h"], ans: 0 },
+            { q: "How do you navigate to the /var/log directory?", opts: ["cd var/log", "cd /var/log", "move /var/log", "dir /var/log"], ans: 1 },
+            { q: "Write command to create three subdirectories: Music, Pictures, and Videos in desktop", opts: ["mkdir ~/Desktop/Music ~/Desktop/Pictures ~/Desktop/Videos", "mkdir Music, Pictures, Videos", "touch Music Pictures Videos", "rmdir Music Pictures Videos"], ans: 0 },
+            { q: "Write command to Create a Single Directory named new_directory", opts: ["mkdir new_directory", "make new_directory", "cd new_directory", "touch new_directory"], ans: 0 },
+            { q: "Write command to Create Nested Directories (parent/child/grandchild)", opts: ["mkdir parent/child/grandchild", "mkdir -p parent/child/grandchild", "mkdir -n parent/child", "cd parent/child"], ans: 1 },
+            { q: "Write command to copy file1.txt to the /home/user/Documents/ directory.", opts: ["cp file1.txt /home/user/Documents/", "move file1.txt /home/", "copy file1.txt to /Documents", "mv file1.txt /Documents"], ans: 0 },
+            { q: "Write command to removing All Files and Directories in the Current Directory", opts: ["rm -rf *", "delete all", "rmdir *", "rm -file *"], ans: 0 },
+            { q: "Best for LAN: Highly accurate and efficient for internal networks.", opts: ["TCP SYN Ping Scan (nmap -sn -PS)", "UDP Ping Scan (nmap -sn -PU)", "ARP Ping Scan (nmap -sn -PR)", "ICMP ECHO Ping Scan"], ans: 2 },
+            { q: "Best for Stealth: Minimal noise, avoids full connections, and can bypass ICMP filtering.", opts: ["ARP Ping Scan", "TCP SYN Ping Scan (nmap -sn -PS)", "UDP Ping Scan", "ICMP Address Mask"], ans: 1 }
+        ];
+
+        let questions = [...originalQuestions];
+        let currentPage = 0;
+        const pageSize = 20;
+        let answersState = {}; // Stores user choices { questionGlobalIndex: selectedOptionIndex }
+
+        function renderQuestions() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            
+            const startIdx = currentPage * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, questions.length);
+            const currentBatch = questions.slice(startIdx, endIdx);
+
+            currentBatch.forEach((item, localIndex) => {
+                const globalIndex = startIdx + localIndex;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "bg-white p-5 border rounded-xl shadow-sm";
+                
+                // Question Header
+                const qTitle = document.createElement('h3');
+                qTitle.className = "text-lg font-bold text-gray-800 mb-4 text-left";
+                qTitle.dir = "ltr";
+                qTitle.innerText = `Q${globalIndex + 1}: ${item.q}`;
+                questionDiv.appendChild(qTitle);
+
+                // Options Container
+                const optsDiv = document.createElement('div');
+                optsDiv.className = "grid grid-cols-1 gap-3";
+                optsDiv.id = `opts-container-${globalIndex}`;
+
+                item.opts.forEach((optText, optIndex) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn w-full text-left ltr text-gray-700 bg-gray-100 border border-gray-300 rounded-lg p-3 focus:outline-none";
+                    btn.dir = "ltr";
+                    btn.innerText = `${String.fromCharCode(65 + optIndex)}) ${optText}`;
+                    btn.onclick = () => selectAnswer(globalIndex, optIndex, item.ans);
+                    
+                    // Restore state if already answered
+                    if (answersState[globalIndex] !== undefined) {
+                        optsDiv.classList.add('disabled-opts');
+                        if (optIndex === item.ans) {
+                            btn.classList.add('correct-ans');
+                        } else if (optIndex === answersState[globalIndex]) {
+                            btn.classList.add('wrong-ans');
+                        }
+                    }
+
+                    optsDiv.appendChild(btn);
+                });
+
+                questionDiv.appendChild(optsDiv);
+                container.appendChild(questionDiv);
+            });
+
+            updateControls();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function selectAnswer(globalIndex, selectedIndex, correctIndex) {
+            const optsContainer = document.getElementById(`opts-container-${globalIndex}`);
+            
+            // Prevent multiple clicks
+            if (optsContainer.classList.contains('disabled-opts')) return;
+            
+            // Save state
+            answersState[globalIndex] = selectedIndex;
+            optsContainer.classList.add('disabled-opts');
+
+            const buttons = optsContainer.getElementsByTagName('button');
+            
+            // Highlight answers immediately
+            for (let i = 0; i < buttons.length; i++) {
+                if (i === correctIndex) {
+                    buttons[i].classList.add('correct-ans');
+                }
+                if (i === selectedIndex && i !== correctIndex) {
+                    buttons[i].classList.add('wrong-ans');
+                }
+            }
+        }
+
+        function nextPage() {
+            if ((currentPage + 1) * pageSize < questions.length) {
+                currentPage++;
+                renderQuestions();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderQuestions();
+            }
+        }
+
+        function shuffleQuestions() {
+            // Shuffle the array
+            questions = [...originalQuestions].sort(() => Math.random() - 0.5);
+            // Reset pagination and states
+            currentPage = 0;
+            answersState = {};
+            renderQuestions();
+        }
+
+        function updateControls() {
+            const start = (currentPage * pageSize) + 1;
+            const end = Math.min((currentPage + 1) * pageSize, questions.length);
+            document.getElementById('progress-info').innerText = `الأسئلة: ${start} - ${end} (من أصل ${questions.length})`;
+            
+            document.getElementById('prev-btn').disabled = currentPage === 0;
+            document.getElementById('next-btn').disabled = end >= questions.length;
+        }
+
+        // Initialize App
+        renderQuestions();
+    </script>
+</body>
+</html>
